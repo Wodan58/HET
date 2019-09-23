@@ -1,0 +1,59 @@
+#
+#   module  : unit.het
+#   version : 1.1
+#   date    : 09/23/19
+#
+
+# push and execute word
+aap ! .
+
+# push and execute list
+(aap noot mies) ! . ; ;
+
+# push and execute special
+(;) / ! .
+
+# definition and dereference
+(a : a *) dup : ;
+aap dup * ! . .
+
+# add to empty list
+aap + .
+
+# add to list
+(aap) noot + .
+
+# divide a singleton list
+(aap) / . .
+
+# divide a list
+(aap noot) / . .
+
+# convert a word to a list
+noot < .
+
+# compare two words
+aap aap = .
+
+# compare two lists
+() = .
+
+# compare two specials
+(a : ; b : ; a * b *) swap : ;
+(;) / (;) / swap * ! ; = . ;
+
+# convert a list to a word
+(n o o t) > .
+
+# get the type of a word
+aap ? .
+
+# get the type of a list
+(aap) ? .
+
+# get the type of a special
+(;) / ? . ;
+
+# compare word and list
+aap = .
+aap () = .

@@ -11,7 +11,7 @@ Overview
 HET looks like an imperative version of [Joy](https://github.com/Wodan58/joy1).
 The abstract machine that the language implements offers a working stack (WS),
 a program stack (PS), and memory (MEM).
-The datatypes of the language are: list, word, and 10 specials.
+The datatypes of the language are: word, list, and 10 specials.
 
 ![Datatypes](graph.png)
 
@@ -44,12 +44,17 @@ Additions
 ---------
 
 The document allows debug output, so I am adding `.`, allowing normal output
-and making debug output optional. `#` can be used to outcommenting code.
+and making debug output optional. `#` can be used to outcomment code.
 
 Installation
 ------------
 
 There is a [bootable floppy image](https://forth.hcc.nl/w/uploads/Agenda/HET_flop_image) with the version from the report.
 
-Install and start [DOSBox](www.dosbox.com/download.php). At the prompt type:
-`boot c:/HET_flop_image` or whatever.
+Install and start [DOSBox](http://www.dosbox.com/download.php). At the prompt
+type: `boot c:/HET_flop_image` or whatever.
+
+The version presented here can be build as follows:
+
+    cmake .
+    cmake --build .
