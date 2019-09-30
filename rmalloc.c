@@ -126,9 +126,9 @@
 #include <stdio.h>
 #if 0
 #include <unistd.h>
+#include <strings.h>
 #endif
 #include <string.h>
-#include <strings.h>
 #include <assert.h>
 #include <setjmp.h>
 #include <signal.h>
