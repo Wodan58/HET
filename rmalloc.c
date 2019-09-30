@@ -132,6 +132,9 @@
 #include <assert.h>
 #include <setjmp.h>
 #include <signal.h>
+#ifndef SIGBUS
+#define SIGBUS	14
+#endif
 #include <stdint.h>
 
 #undef  MALLOC_DEBUG		/* here we need the correct malloc functions */
