@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.1
-    date    : 09/23/19
+    version : 1.2
+    date    : 09/30/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -13,7 +13,7 @@
 #include "khash.h"
 #include "memory.h"
 
-#if INT_MAX == 2147483647
+#if LONG_MAX == 2147483647
 KHASH_MAP_INIT_INT(Backup, char);
 #else
 KHASH_MAP_INIT_INT64(Backup, char);

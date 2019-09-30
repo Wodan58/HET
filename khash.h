@@ -127,7 +127,7 @@ typedef unsigned long long khint64_t;
 #endif
 #endif /* klib_unused */
 
-#if INT_MAX == 2147483647
+#if LONG_MAX == 2147483647
 typedef khint32_t khint_t;
 #else
 typedef khint64_t khint_t;

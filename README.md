@@ -1,9 +1,9 @@
 HET
 ---
 
-Build|Linux|Windows|Coverage|Codecov
----|---|---|---|---
-status|[![Travis CI build status](https://travis-ci.org/Wodan58/HET.svg?branch=master)](https://travis-ci.org/Wodan58/HET)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/HET?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/HET)|[![Coverage Status](https://coveralls.io/repos/github/Wodan58/HET/badge.svg?branch=master)](https://coveralls.io/github/Wodan58/HET?branch=master)|[![Codecov](https://codecov.io/gh/Wodan58/HET/branch/master/graph/badge.svg)](https://codecov.io/gh/Wodan58/HET)
+Build|Linux|Windows
+---|---|---
+status|[![Travis CI build status](https://travis-ci.org/Wodan58/HET.svg?branch=master)](https://travis-ci.org/Wodan58/HET)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/HET?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/HET)
 
 HET is a very simple educational programming language dating from 1976
 and described in this [document](https://ir.cwi.nl/pub/12870/12870D.pdf),
