@@ -127,7 +127,11 @@ typedef unsigned long long khint64_t;
 #endif
 #endif /* klib_unused */
 
+#if INT_MAX == 2147483647
 typedef khint32_t khint_t;
+#else
+typedef khint64_t khint_t;
+#endif
 typedef khint_t khiter_t;
 
 #define __ac_isempty(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&2)

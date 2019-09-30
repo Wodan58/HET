@@ -124,7 +124,9 @@
    ========= */
 
 #include <stdio.h>
+#if 0
 #include <unistd.h>
+#endif
 #include <string.h>
 #include <strings.h>
 #include <assert.h>
@@ -1276,6 +1278,7 @@ char *Rstrdup(const char *s, const char *file)
    Purpose:		Wrapper function for getcwd() which sometimes returns
 			memory from heap.
    ============================================================================= */
+#if 0
 char *Rgetcwd(char *buffer, size_t size, const char *file)
 {
   char *ret = getcwd(buffer, size);
@@ -1290,7 +1293,7 @@ char *Rgetcwd(char *buffer, size_t size, const char *file)
 
   return ret;
 }
-
+#endif
 
 /* =============================================================================
    Function:		Rmalloc_test		// external //
