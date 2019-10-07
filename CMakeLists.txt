@@ -1,15 +1,16 @@
 #
-#   module  : cmakelists.txt
-#   version : 1.4
-#   date    : 10/04/19
+#   module  : CMakeLists.txt
+#   version : 1.5
+#   date    : 10/07/19
 #
 cmake_minimum_required(VERSION 3.0)
 project(HET)
 if(WIN32)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
+else()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+endif()
 add_executable(het het.c memory.c rmalloc.c)
 add_custom_target(demo1.txt ALL
 		  COMMAND het unit.het >demo1.txt
