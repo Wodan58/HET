@@ -1,7 +1,7 @@
 /*
     module  : vector.h
-    version : 1.1
-    date    : 09/23/19
+    version : 1.2
+    date    : 10/11/19
 */
 #define vector(type)	struct { unsigned n, m; type *a; }
 #define vec_init(v)	do { (v) = mem_malloc(sizeof(*(v))); (v)->n = 0; \
@@ -17,7 +17,6 @@
 #define vec_index(v, i)	((v)->a + (i))
 #define vec_at(v, i)	((v)->a[i])
 #define vec_back(v)	((v)->a[(v)->n - 1])
-#define vec_pop(v)	((v)->a + --(v)->n)
 #define vec_pop_back(v)	(--(v)->n)
 #define vec_empty(v)	(!(v)->n || (v)->n > (v)->m)
 #define vec_copy(v, w)	do { (w) = mem_malloc(sizeof(*(w))); (w)->n = \

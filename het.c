@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.1
-    date    : 09/23/19
+    version : 1.2
+    date    : 10/11/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -20,8 +20,8 @@
 #define MAX_IDENT	100
 
 #define SPECIAL(i)	((i) >= '!' && (i) <= '?')
-#define WORD(i)		((i) & BIT_IDENT)
-#define LIST(i)		(!SPECIAL(i) && !WORD(i))
+#define WORD(i)		(((i) & BIT_IDENT) != 0)
+#define LIST(i)		(((i) & BIT_IDENT) == 0)
 
 char ident[MAX_IDENT + 1];	/* identifier */
 
@@ -35,6 +35,13 @@ KHASH_MAP_INIT_STR(Symbol, intptr_t);
 
 static khash_t(Symbol) *MEM;	/* memory */
 
+typedef void (*proc_t)(void);
+
+KHASH_MAP_INIT_STR(Foreign, proc_t);
+
+static khash_t(Foreign) *FFI;	/* foreign function interface */
+
+void do_gc(void);
 void readlist(void);
 void marklist(Stack *List);
 void writefactor(intptr_t Value);
@@ -76,7 +83,7 @@ void marklist(Stack *List)
 	markfactor(vec_at(List, i));
 }
 
-void gc()
+void do_gc(void)
 {
     khiter_t key;
 
@@ -101,6 +108,7 @@ void free_rest(void)
     stk_free(WS);
     stk_free(PS);
     kh_destroy(Symbol, MEM);
+    kh_destroy(Foreign, FFI);
     mem_exit();
 }
 
@@ -137,6 +145,32 @@ void enter(char *str, intptr_t value)
 
     key = kh_put(Symbol, MEM, str, &rv);
     kh_value(MEM, key) = value;
+}
+
+/* -------------------------------------------------------------------------- */
+
+proc_t foreign(char *str)
+{
+    khiter_t key;
+    proc_t value = 0;
+
+    if ((key = kh_get(Foreign, FFI, str)) != kh_end(FFI))
+	value = kh_value(FFI, key);
+    return value;
+}
+
+void inter(char *str, proc_t value)
+{
+    int rv;
+    khiter_t key;
+
+    key = kh_put(Foreign, FFI, str, &rv);
+    kh_value(FFI, key) = value;
+}
+
+void init_ffi(void)
+{
+    inter("gc", do_gc);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -228,6 +262,7 @@ intptr_t next(void)
 void eval(void)
 {
     int i, j;
+    proc_t proc;
     char *ptr, *str;
     Stack *list, *quot;
     intptr_t temp, value;
@@ -244,6 +279,14 @@ void eval(void)
 		}
 		vec_pop_back(WS);
 		break;
+    case '$'  : assert(vec_size(WS) > 0);
+		temp = vec_back(WS);
+		vec_pop_back(WS);
+		assert(!SPECIAL(temp) && WORD(temp));
+		proc = foreign((char *)(temp & ~BIT_IDENT));
+		assert(proc);
+		(*proc)();
+		break;
     case '*'  : assert(vec_size(WS) > 0);
 		temp = vec_back(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
@@ -253,7 +296,7 @@ void eval(void)
 		value = vec_back(WS);
 		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
-		assert(LIST(temp));
+		assert(!SPECIAL(temp) && LIST(temp));
 		if ((list = (Stack *)temp) == 0)
 		    vec_init(list);
 		vec_add(list, value);
@@ -271,7 +314,7 @@ void eval(void)
 		break;
     case '/'  :	assert(vec_size(WS) > 0);
 		temp = vec_back(WS);
-		assert(LIST(temp));
+		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
 		assert(vec_size(list) > 0);
 		temp = vec_back(list);
@@ -283,7 +326,7 @@ void eval(void)
 		break;
     case ':'  : assert(vec_size(WS) > 0);
 		temp = vec_back(WS);
-		assert(WORD(temp));
+		assert(!SPECIAL(temp) && WORD(temp));
 		ptr = (char *)(temp & ~BIT_IDENT);
 		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
@@ -317,7 +360,8 @@ void eval(void)
 		if (!temp || SPECIAL(value) || !WORD(value))
 		    temp = temp == value ? t : f;
 		else {
-		    assert(WORD(temp) && WORD(value));
+		    assert(!SPECIAL(temp) && WORD(temp) &&
+			   !SPECIAL(value) && WORD(value));
 		    temp = strcmp((char *)(temp & ~BIT_IDENT),
 				  (char *)(value & ~BIT_IDENT)) ? f : t;
 		}
@@ -328,12 +372,13 @@ void eval(void)
 		break;
     case '>'  : assert(vec_size(WS) > 0);
 		temp = vec_back(WS);
-		assert(LIST(temp));
+		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
 		ptr = mem_malloc(vec_size(list) + 1);
 		for (j = 0, i = vec_size(list) - 1; i >= 0; i--) {
-		    assert(WORD(vec_at(list, i)));
-		    str = (char *)(vec_at(list, i) & ~BIT_IDENT);
+		    value = vec_at(list, i);
+		    assert(!SPECIAL(value) && WORD(value));
+		    str = (char *)(value & ~BIT_IDENT);
 		    ptr[j++] = *str;
 		}
 		ptr[j] = 0;
@@ -431,6 +476,8 @@ int main(int argc, char *argv[])
     stk_init(WS);
     stk_init(PS);
     MEM = kh_init(Symbol);
+    FFI = kh_init(Foreign);
+    init_ffi();
     for (;;) {
 	if (vec_empty(PS))
 	    if (read(), debugging)

@@ -1,7 +1,7 @@
 #
 #   module  : unit.het
-#   version : 1.1
-#   date    : 09/23/19
+#   version : 1.2
+#   date    : 10/11/19
 #
 
 # push and execute word
@@ -31,6 +31,9 @@ aap + .
 
 # convert a word to a list
 noot < .
+
+# collect garbage
+gc $ .
 
 # compare two words
 aap aap = .

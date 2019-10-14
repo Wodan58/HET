@@ -25,6 +25,7 @@ tells how many items are taken from the WS and how many are returned.
 Special | Arity | Description
 ------- | ----- | --------------------------------------------------------------
 `!` | 1/0 | Move an item from the WS to the PS, unpacking list items.
+`$` | 1/0 | Execute a foreign function. *Addition*
 `#` | 0/0 | Ignore the rest of the line. *Addition*
 `*` | 1/1 | Replace a word on the WS with its definition.
 `+` | 2/1 | Add an item to a list.
@@ -49,7 +50,7 @@ Additions
 
 The document allows debug output, so I am adding `.`, allowing normal output
 and making debug output optional. `#` can be used to comment out the rest of
-the line.
+the line. `$` adds foreign functions.
 
 Installation
 ------------

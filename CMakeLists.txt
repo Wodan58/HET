@@ -1,10 +1,11 @@
 #
-#   module  : CMakeLists.txt
-#   version : 1.5
-#   date    : 10/07/19
+#   module  : cmakelists.txt
+#   version : 1.6
+#   date    : 10/11/19
 #
 cmake_minimum_required(VERSION 3.0)
 project(HET)
+add_definitions(-DMALLOC_DEBUG)
 if(WIN32)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
