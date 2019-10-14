@@ -25,11 +25,11 @@ tells how many items are taken from the WS and how many are returned.
 Special | Arity | Description
 ------- | ----- | --------------------------------------------------------------
 `!` | 1/0 | Move an item from the WS to the PS, unpacking list items.
-`$` | 1/0 | Execute a foreign function. *Addition*
-`#` | 0/0 | Ignore the rest of the line. *Addition*
+`$` | 1/0 | Execute a foreign function. _Addition_
+`#` | 0/0 | Ignore the rest of the line. _Addition_
 `*` | 1/1 | Replace a word on the WS with its definition.
 `+` | 2/1 | Add an item to a list.
-`.` | 1/0 | Print an item from the WS and a newline. Remove the item. *Addition*
+`.` | 1/0 | Print an item from the WS and a newline. Remove the item. _Addition_
 `/` | 1/2 | Divide a non-empty list into rest and first.
 `:` | 2/1 | Take a word and an item from the WS and store the assignment in MEM.
 `;` | 1/0 | Remove an item from the WS.
