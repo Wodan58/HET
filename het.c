@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.2
-    date    : 10/11/19
+    version : 1.3
+    date    : 10/18/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -40,6 +40,8 @@ typedef void (*proc_t)(void);
 KHASH_MAP_INIT_STR(Foreign, proc_t);
 
 static khash_t(Foreign) *FFI;	/* foreign function interface */
+
+#include "builtin.h"
 
 void do_gc(void);
 void readlist(void);
@@ -171,6 +173,7 @@ void inter(char *str, proc_t value)
 void init_ffi(void)
 {
     inter("gc", do_gc);
+#include "builtin.c"
 }
 
 /* -------------------------------------------------------------------------- */
@@ -263,8 +266,8 @@ void eval(void)
 {
     int i, j;
     proc_t proc;
+    Stack *list;
     char *ptr, *str;
-    Stack *list, *quot;
     intptr_t temp, value;
 
     switch (temp = next()) {
@@ -333,11 +336,7 @@ void eval(void)
 		if (!temp || SPECIAL(temp) || WORD(temp))
 		    enter(ptr, (intptr_t)temp);
 		else {
-		    quot = (Stack *)temp;
-		    if (vec_empty(quot))
-			list = 0;
-		    else
-			vec_copy(quot, list);
+		    vec_copy((Stack *)temp, list);
 		    enter(ptr, (intptr_t)list);
 		}
 		break;
@@ -350,7 +349,7 @@ void eval(void)
 		vec_init(list);
 		ptr = (char *)(temp & ~BIT_IDENT);
 		for (i = strlen(ptr) - 1; i >= 0; i--)
-		   vec_add(list, ch2word(ptr[i]));
+		    vec_add(list, ch2word(ptr[i]));
 		vec_back(WS) = (intptr_t)list;
 		break;
     case '='  : assert(vec_size(WS) > 0);

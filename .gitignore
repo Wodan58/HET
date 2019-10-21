@@ -1,6 +1,8 @@
 cmake_install.cmake
 CMakeCache.txt
 CMakeFiles
-demo1.txt
+demo*.txt
 het.exe
 Makefile
+builtin.c
+builtin.h
