@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.2
-    date    : 09/30/19
+    version : 1.3
+    date    : 10/26/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -129,14 +129,13 @@ void *mem_realloc(void *old, size_t size)
     void *ptr;
 
     allocated += size / 2;
-    if ((ptr = realloc(old, size)) != 0) {
-	if (ptr != old) {
-	    forget((intptr_t)old);
-	    remind((intptr_t)ptr);
-	}
-	return ptr;
+    if ((ptr = realloc(old, size)) == 0)
+	ptr = old;
+    else if (ptr != old) {
+	forget((intptr_t)old);
+	remind((intptr_t)ptr);
     }
-    return old;
+    return ptr;
 }
 
 /*
