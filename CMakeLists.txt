@@ -1,7 +1,7 @@
 #
-#   module  : cmakelists.txt
-#   version : 1.8
-#   date    : 10/18/19
+#   module  : CMakeLists.txt
+#   version : 1.9
+#   date    : 11/01/19
 #
 cmake_minimum_required(VERSION 3.0)
 project(HET)
@@ -34,3 +34,9 @@ add_custom_target(demo2.txt ALL
 add_custom_target(comp2 ALL
 		  COMMAND diff -w demo2.txt tut.out
 		  DEPENDS demo2.txt)
+add_custom_command(OUTPUT tut.het
+		   COMMAND clang -E -x c tut.hetx -I . -o tut.het
+		   MAIN_DEPENDENCY tut.hetx lib.hetx
+		   COMMENT "Preprocessing tut.hetx"
+		   VERBATIM
+		  )
