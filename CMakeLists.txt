@@ -1,7 +1,7 @@
 #
-#   module  : CMakeLists.txt
-#   version : 1.9
-#   date    : 11/01/19
+#   module  : cmakelists.txt
+#   version : 1.10
+#   date    : 11/04/19
 #
 cmake_minimum_required(VERSION 3.0)
 project(HET)
@@ -15,8 +15,7 @@ endif()
 add_executable(het het.c memory.c rmalloc.c)
 add_dependencies(het always)
 add_custom_target(always
-		  COMMAND sh builtin.sh
-		 )
+		  COMMAND sh builtin.sh)
 add_custom_target(demo1.txt ALL
 		  COMMAND het unit.het >demo1.txt
 		  DEPENDS het unit.het)
@@ -37,6 +36,6 @@ add_custom_target(comp2 ALL
 add_custom_command(OUTPUT tut.het
 		   COMMAND clang -E -x c tut.hetx -I . -o tut.het
 		   MAIN_DEPENDENCY tut.hetx lib.hetx
+		   DEPENDS tut.hetx lib.hetx
 		   COMMENT "Preprocessing tut.hetx"
-		   VERBATIM
-		  )
+		   VERBATIM)

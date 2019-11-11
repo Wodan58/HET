@@ -17,7 +17,7 @@ The abstract machine that the language implements offers a working stack (WS),
 a program stack (PS), and memory (MEM).
 The datatypes of the language are: word, list, and 10 specials.
 
-![Datatypes](graph.png)
+![Datatypes](graph.jpg)
 
 The specials are described in the following table. The arity in this table
 tells how many items are taken from the WS and how many are returned.
