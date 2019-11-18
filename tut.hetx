@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.4
-    date    : 11/04/19
+    version : 1.5
+    date    : 11/11/19
 */
 #include "lib.hetx"
 
@@ -9,3 +9,4 @@
 1 2 add $ 3 4 add $ mul $ .
 2 2 add $ 2 2 mul $ = put-bool * ! .
 6 6 mul $ 5 7 mul $ greater * ! put-bool * ! .
+true * false * or * ! true * and * ! not * ! put-bool * ! .

@@ -1,5 +1,5 @@
 #
-#   module  : cmakelists.txt
+#   module  : CMakeLists.txt
 #   version : 1.10
 #   date    : 11/04/19
 #
