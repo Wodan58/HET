@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.3
-    date    : 11/11/19
+    version : 1.4
+    date    : 11/18/19
 */
 ( true t : ;
   false f : ;
@@ -19,3 +19,13 @@ f false : ;
 (a : ; b : ; () a * + b * + > ff = f =) or : ;
 
 (t = f =) not : ;
+
+(list *
+  () t : ;
+  (list * / prog * ! step * !) f : ;
+() = * !) step : ;
+
+(list : ;			# old list
+  ()				# new list
+  (swap * ! ; +) prog : ;	# program
+step * !) reverse : ;

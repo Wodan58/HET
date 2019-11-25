@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.3
-    date    : 10/18/19
+    version : 1.4
+    date    : 11/18/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -43,7 +43,6 @@ static khash_t(Foreign) *FFI;	/* foreign function interface */
 
 #include "builtin.h"
 
-void do_gc(void);
 void readlist(void);
 void marklist(Stack *List);
 void writefactor(intptr_t Value);
@@ -54,12 +53,22 @@ void reverse(Stack *list)
     intptr_t *PValue1, *PValue2, Temp;
 
     for (i = 0, j = vec_size(list) - 1; i < j; i++, j--) {
-	PValue2 = vec_index(list, j);
-	PValue1 = vec_index(list, i);
+	PValue2 = &vec_at(list, j);
+	PValue1 = &vec_at(list, i);
 	Temp = *PValue1;
 	*PValue1 = *PValue2;
 	*PValue2 = Temp;
     }
+}
+
+void copy(Stack *v, Stack **w)
+{
+    (*w) = mem_malloc(sizeof(*v));
+    if (!((*w)->m = (*w)->n = v->n))
+	(*w)->m = 1;
+    (*w)->a = mem_malloc(sizeof(*v->a) * (*w)->m);
+    if (v->n)
+	memcpy((*w)->a, v->a, sizeof(*v->a) * v->n);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -72,7 +81,7 @@ void markfactor(intptr_t Value)
 	mark(Value & ~BIT_IDENT);
     else {
 	mark(Value);
-	mark((intptr_t)vec_data((Stack *)Value));
+	mark((intptr_t)&vec_at((Stack *)Value, 0));
 	marklist((Stack *)Value);
     }
 }
@@ -255,7 +264,7 @@ intptr_t next(void)
 {
     intptr_t value = 0;
 
-    if (!vec_empty(PS)) {
+    if (vec_size(PS)) {
 	value = vec_back(PS);
 	vec_pop_back(PS);
     }
@@ -322,8 +331,6 @@ void eval(void)
 		assert(vec_size(list) > 0);
 		temp = vec_back(list);
 		vec_pop_back(list);
-		if (vec_empty(list))
-		    list = 0;
 		vec_back(WS) = (intptr_t)list;
 		stk_add(WS, temp);
 		break;
@@ -334,9 +341,9 @@ void eval(void)
 		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
 		if (!temp || SPECIAL(temp) || WORD(temp))
-		    enter(ptr, (intptr_t)temp);
+		    enter(ptr, temp);
 		else {
-		    vec_copy((Stack *)temp, list);
+		    copy((Stack *)temp, &list);
 		    enter(ptr, (intptr_t)list);
 		}
 		break;
@@ -356,14 +363,24 @@ void eval(void)
 		value = vec_back(WS);
 		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
-		if (!temp || SPECIAL(value) || !WORD(value))
-		    temp = temp == value ? t : f;
-		else {
-		    assert(!SPECIAL(temp) && WORD(temp) &&
-			   !SPECIAL(value) && WORD(value));
-		    temp = strcmp((char *)(temp & ~BIT_IDENT),
-				  (char *)(value & ~BIT_IDENT)) ? f : t;
-		}
+	        if (SPECIAL(value)) {
+		    if (SPECIAL(temp))
+			temp = temp == value ? t : f;
+		    else
+			temp = f;
+		} else if (WORD(value)) {
+		    if (SPECIAL(temp))
+			temp = f;
+		    else if (WORD(temp))
+			temp = strcmp((char *)(value & ~BIT_IDENT),
+				      (char *)(temp & ~BIT_IDENT)) ? f : t;
+		    else
+			temp = f;
+		} else if (!vec_size((Stack *)value) &&
+			   !vec_size((Stack *)temp))
+		    temp = t;
+		else
+		    temp = f;
 		if (vec_size(WS))
 		    vec_back(WS) = temp;
 		else
@@ -478,7 +495,7 @@ int main(int argc, char *argv[])
     FFI = kh_init(Foreign);
     init_ffi();
     for (;;) {
-	if (vec_empty(PS))
+	if (!vec_size(PS))
 	    if (read(), debugging)
 		print();
 	if (eval(), debugging)
