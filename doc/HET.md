@@ -21,6 +21,22 @@ into several unnamed sections. These sections could have been separate files,
 but because the total number of lines is so small, they are more easily seen
 in one file.
 
+Technicalities
+==============
+
+The empty list, `()`, is internally represented with an intptr_t that has all
+bits set to zero, or as a pointer to a list with no entries. The two are
+treated as equal by `=`.
+
+Specials `+` and `/` destroy the list they are working on; `!` and `:` make
+a shallow copy. Specials '.' and ';' can operate on an empty WS; all other
+specials require at least one item on the WS.
+
+Behaviour that is not expected is captured with an assert statement unless
+the code has been compiled with -DNDEBUG. Such behaviour should therefore be
+considered as undefined. For all such behaviour: the source code will be the
+ultimate reference.
+
 Limitations
 ===========
 

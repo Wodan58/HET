@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.3
-    date    : 10/26/19
+    version : 1.4
+    date    : 11/25/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -13,6 +13,8 @@
 #include "khash.h"
 #include "memory.h"
 
+#define SPECIAL(i)	((i) >= '!' && (i) <= '?')
+
 #if LONG_MAX == 2147483647
 KHASH_MAP_INIT_INT(Backup, char);
 #else
@@ -22,6 +24,15 @@ KHASH_MAP_INIT_INT64(Backup, char);
 static khash_t(Backup) *MEM;	/* memory */
 
 static intptr_t allocated, max_alloc;
+
+/*
+    Report a fatal error and abort execution.
+*/
+void fatal(char *str)
+{
+    fprintf(stderr, "%s\n", str);
+    exit(1);
+}
 
 /*
     Report the maximum amount of memory allocated.
@@ -100,12 +111,15 @@ void forget(intptr_t ptr)
 */
 char *mem_strdup(char *str)
 {
-    char *ptr;
+    intptr_t temp;
 
     allocated += strlen(str) + 1;
-    if ((ptr = strdup(str)) != 0)
-	remind((intptr_t)ptr);
-    return ptr;
+    do
+	if ((temp = (intptr_t)strdup(str)) == 0)
+	    fatal("Out of memory");
+    while (SPECIAL(temp));
+    remind(temp);
+    return (char *)temp;
 }
 
 /*
@@ -113,12 +127,15 @@ char *mem_strdup(char *str)
 */
 void *mem_malloc(size_t size)
 {
-    void *ptr;
+    intptr_t temp;
 
     allocated += size;
-    if ((ptr = malloc(size)) != 0)
-	remind((intptr_t)ptr);
-    return ptr;
+    do
+	if ((temp = (intptr_t)malloc(size)) == 0)
+	    fatal("Out of memory");
+    while (SPECIAL(temp));
+    remind(temp);
+    return (void *)temp;
 }
 
 /*
@@ -126,16 +143,18 @@ void *mem_malloc(size_t size)
 */
 void *mem_realloc(void *old, size_t size)
 {
-    void *ptr;
+    intptr_t temp;
 
     allocated += size / 2;
-    if ((ptr = realloc(old, size)) == 0)
-	ptr = old;
-    else if (ptr != old) {
+    do
+	if ((temp = (intptr_t)realloc(old, size)) == 0)
+	    fatal("Out of memory");
+    while (SPECIAL(temp));
+    if (temp != (intptr_t)old) {
 	forget((intptr_t)old);
-	remind((intptr_t)ptr);
+	remind(temp);
     }
-    return ptr;
+    return (void *)temp;
 }
 
 /*
@@ -144,6 +163,24 @@ void *mem_realloc(void *old, size_t size)
 void mem_exit(void)
 {
     kh_destroy(Backup, MEM);
+}
+
+void *chk_malloc(size_t size)
+{
+    void *ptr;
+
+    if ((ptr = malloc(size)) == 0)
+	fatal("Out of memory");
+    return ptr;
+}
+
+void *chk_realloc(void *old, size_t size)
+{
+    void *ptr;
+
+    if ((ptr = realloc(old, size)) == 0)
+	fatal("Out of memory");
+    return ptr;
 }
 
 #if 0

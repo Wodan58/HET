@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.4
-    date    : 11/18/19
+    version : 1.5
+    date    : 11/25/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -13,8 +13,8 @@
 #include <inttypes.h>
 #include "rmalloc.h"
 #include "khash.h"
-#include "vector.h"
 #include "memory.h"
+#include "vector.h"
 
 #define BIT_IDENT	1
 #define MAX_IDENT	100
@@ -40,8 +40,6 @@ typedef void (*proc_t)(void);
 KHASH_MAP_INIT_STR(Foreign, proc_t);
 
 static khash_t(Foreign) *FFI;	/* foreign function interface */
-
-#include "builtin.h"
 
 void readlist(void);
 void marklist(Stack *List);
@@ -70,6 +68,8 @@ void copy(Stack *v, Stack **w)
     if (v->n)
 	memcpy((*w)->a, v->a, sizeof(*v->a) * v->n);
 }
+
+#include "builtin.h"
 
 /* -------------------------------------------------------------------------- */
 
@@ -280,18 +280,19 @@ void eval(void)
     intptr_t temp, value;
 
     switch (temp = next()) {
-    case '!'  : assert(vec_size(WS) > 0);
+    case '!'  : assert(vec_size(WS));
 		temp = vec_back(WS);
-		if (SPECIAL(temp) || WORD(temp))
+		if (SPECIAL(temp)) {
 		    stk_add(PS, temp);
-		else {
+		    vec_pop_back(WS);
+		} else if (LIST(temp)) {
 		    list = (Stack *)temp;
 		    for (j = vec_size(list), i = 0; i < j; i++)
 			stk_add(PS, vec_at(list, i));
+		    vec_pop_back(WS);
 		}
-		vec_pop_back(WS);
 		break;
-    case '$'  : assert(vec_size(WS) > 0);
+    case '$'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		vec_pop_back(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
@@ -299,12 +300,12 @@ void eval(void)
 		assert(proc);
 		(*proc)();
 		break;
-    case '*'  : assert(vec_size(WS) > 0);
+    case '*'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
 		vec_back(WS) = lookup((char *)(temp & ~BIT_IDENT));
 		break;
-    case '+'  : assert(vec_size(WS) > 0);
+    case '+'  : assert(vec_size(WS));
 		value = vec_back(WS);
 		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
@@ -324,17 +325,17 @@ void eval(void)
 		    putchar('\n');
 		}
 		break;
-    case '/'  :	assert(vec_size(WS) > 0);
+    case '/'  :	assert(vec_size(WS));
 		temp = vec_back(WS);
 		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
-		assert(vec_size(list) > 0);
+		assert(vec_size(list));
 		temp = vec_back(list);
 		vec_pop_back(list);
 		vec_back(WS) = (intptr_t)list;
 		stk_add(WS, temp);
 		break;
-    case ':'  : assert(vec_size(WS) > 0);
+    case ':'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
 		ptr = (char *)(temp & ~BIT_IDENT);
@@ -350,7 +351,7 @@ void eval(void)
     case ';'  : if (vec_size(WS))
 		    vec_pop_back(WS);
 		break;
-    case '<'  : assert(vec_size(WS) > 0);
+    case '<'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		assert(temp & BIT_IDENT);
 		vec_init(list);
@@ -359,7 +360,7 @@ void eval(void)
 		    vec_add(list, ch2word(ptr[i]));
 		vec_back(WS) = (intptr_t)list;
 		break;
-    case '='  : assert(vec_size(WS) > 0);
+    case '='  : assert(vec_size(WS));
 		value = vec_back(WS);
 		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
@@ -386,7 +387,7 @@ void eval(void)
 		else
 		    stk_add(WS, temp);
 		break;
-    case '>'  : assert(vec_size(WS) > 0);
+    case '>'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
@@ -400,7 +401,7 @@ void eval(void)
 		ptr[j] = 0;
 		vec_back(WS) = (intptr_t)ptr | BIT_IDENT;
 		break;
-    case '?'  : assert(vec_size(WS) > 0);
+    case '?'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		if (SPECIAL(temp))
 		    vec_back(WS) = s;
