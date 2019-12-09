@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.7
-    date    : 11/25/19
+    version : 1.8
+    date    : 12/02/19
 */
 #include "lib.hetx"
 
@@ -12,3 +12,4 @@
 true * false * or * ! true * and * ! not * ! put-bool * ! .
 (1 2 3 4 5) reverse * ! .
 (peter paul) (mary jane) concat * ! .
+(11 false X 44) last * ! .

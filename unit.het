@@ -1,7 +1,7 @@
 #
 #   module  : unit.het
-#   version : 1.2
-#   date    : 10/11/19
+#   version : 1.3
+#   date    : 12/02/19
 #
 
 # push and execute word
@@ -60,3 +60,15 @@ aap ? .
 # compare word and list
 aap = .
 aap () = .
+
+# compare special and word
+(;) / semi = . ;
+
+# compare word and special
+semi (;) / swap * ! ; = .
+
+# compare list and word
+empty = .
+
+# lists cannot be compared with =
+(1 2 3) (1 2 3) = .
