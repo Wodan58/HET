@@ -1,37 +1,65 @@
 /*
     module  : lib.hetx
-    version : 1.6
-    date    : 12/02/19
+    version : 1.8
+    date    : 12/16/19
 */
 ( true t : ;
   false f : ;
-* !) put-bool : ;
+* !) put_bool : ;
+#define put_bool	put_bool * !
 
-(a : ; b : ; a * b *) swap : ;
+#define gc		gc $
+#define add		add $
+#define mul		mul $
+#define less		less $
 
-(swap * ! less $) greater : ;
+(a % ; b % ; a * b *) swap : ;
+#define swap		swap * !
 
-t true : ;
-f false : ;
+(swap less) greater : ;
+#define greater		greater * !
 
-(a : ; b : ; () a * + b * + > tt =) and : ;
+#define true		t
+#define false		f
 
-(a : ; b : ; () a * + b * + > ff = f =) or : ;
+(a % ; b % ; () a * + b * + > tt =) and : ;
+#define and		and * !
+
+(a % ; b % ; () a * + b * + > ff = f =) or : ;
+#define or		or * !
 
 (f =) not : ;
+#define not		not * !
 
-(/ swap * ! ;) first : ;
+(/ swap ;) first : ;
+#define first		first * !
 
-( list *
-  () t : ;
-  (list * first * ! prog * ! step * !) f : ;
-() = * !) step : ;
+( () t : ;
+  (list * first prog * ! step_rec * !) f : ;
+list * () = * !) step_rec : ;
+#define step_rec	step_rec * !
 
-( list : ;			# old list
-  ()				# new list
-  (+) prog : ;			# program
-step * !) reverse : ;
+( prog : ;		# pick up prog
+  list : ;		# pick up list
+step_rec) step : ;
+#define step		step * !
 
-(swap * ! reverse * ! list : ; step * !) concat : ;
+( list : ;		# old list
+  ()			# new list
+list * (+) step) reverse : ;
+#define reverse		reverse * !
 
-(reverse * ! first * !) last : ;
+(swap reverse (+) step) concat : ;
+#define concat		concat * !
+
+(reverse first) last : ;
+#define last		last * !
+
+( list : ;			# list
+  elem : ;			# element
+  f				# assume false
+  ( (; t () list : ;) t : ;	# if equal: pop f, push t, and set list to ()
+    () f : ;			# if not equal: do nothing
+  elem * = * !) prog : ;	# program
+step_rec) member : ;
+#define member		member * !

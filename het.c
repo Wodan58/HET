@@ -1,12 +1,11 @@
 /*
     module  : het.c
-    version : 1.5
-    date    : 11/25/19
+    version : 1.7
+    date    : 12/16/19
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <assert.h>
@@ -23,13 +22,14 @@
 #define WORD(i)		(((i) & BIT_IDENT) != 0)
 #define LIST(i)		(((i) & BIT_IDENT) == 0)
 
-char ident[MAX_IDENT + 1];	/* identifier */
+				/* identifier */
+static char ident[MAX_IDENT + 1];
 
-intptr_t t, f, s, w, l;		/* standard identifiers */
+static intptr_t t, f, s, w, l;	/* standard identifiers */
 
 typedef vector(intptr_t) Stack;
 
-Stack *WS, *PS;			/* working stack, program stack */
+static Stack *WS, *PS;		/* working stack, program stack */
 
 KHASH_MAP_INIT_STR(Symbol, intptr_t);
 
@@ -40,6 +40,19 @@ typedef void (*proc_t)(void);
 KHASH_MAP_INIT_STR(Foreign, proc_t);
 
 static khash_t(Foreign) *FFI;	/* foreign function interface */
+
+typedef struct nameval {
+    char *name;
+    intptr_t value;
+} nameval;
+
+typedef vector(nameval) Local;
+
+static Local *LOC;		/* local definitions/variables */
+
+typedef vector(int) Index;
+
+static Index *IDX;		/* frame pointers */
 
 void readlist(void);
 void marklist(Stack *List);
@@ -96,6 +109,8 @@ void marklist(Stack *List)
 
 void do_gc(void)
 {
+    int i;
+    nameval nv;
     khiter_t key;
 
     mark(t & ~BIT_IDENT);
@@ -110,6 +125,11 @@ void do_gc(void)
 	    mark((intptr_t)kh_key(MEM, key));
 	    markfactor((intptr_t)kh_value(MEM, key));
 	}
+    for (i = vec_size(LOC) - 1; i >= 0; i--) {
+	nv = vec_at(LOC, i);
+	mark((intptr_t)nv.name);
+	markfactor(nv.value);
+    }
     scan();
 }
 
@@ -118,6 +138,8 @@ void free_rest(void)
     scan();
     stk_free(WS);
     stk_free(PS);
+    stk_free(LOC);
+    stk_free(IDX);
     kh_destroy(Symbol, MEM);
     kh_destroy(Foreign, FFI);
     mem_exit();
@@ -141,9 +163,16 @@ intptr_t ch2word(int ch)
 
 intptr_t lookup(char *str)
 {
+    int i;
+    nameval nv;
     khiter_t key;
     intptr_t value = 0;
 
+    for (i = vec_size(LOC) - 1; i >= 0; i--) {
+	nv = vec_at(LOC, i);
+	if (!strcmp(str, nv.name))
+	    return nv.value;
+    }
     if ((key = kh_get(Symbol, MEM, str)) != kh_end(MEM))
 	value = kh_value(MEM, key);
     return value;
@@ -156,6 +185,15 @@ void enter(char *str, intptr_t value)
 
     key = kh_put(Symbol, MEM, str, &rv);
     kh_value(MEM, key) = value;
+}
+
+void local(char *str, intptr_t value)
+{
+    nameval nv;
+
+    nv.name = str;
+    nv.value = value;
+    stk_add(LOC, nv);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -203,11 +241,11 @@ int yylex(void)
 retry:
     while ((ch = getch()) <= ' ')
 	;
-    if (ch == '-' || isalnum(ch)) {
+    if (ch == '_' || isalnum(ch)) {
 	do
 	    if (i < MAX_IDENT)
 		ident[i++] = ch;
-	while ((ch = getch()) == '-' || isalnum(ch));
+	while ((ch = getch()) == '_' || isalnum(ch));
 	ungetc(ch, stdin);
 	ident[i] = 0;
 	return BIT_IDENT;
@@ -279,7 +317,9 @@ void eval(void)
     char *ptr, *str;
     intptr_t temp, value;
 
-    switch (temp = next()) {
+    temp = next();
+again:
+    switch (temp) {
     case '!'  : assert(vec_size(WS));
 		temp = vec_back(WS);
 		if (SPECIAL(temp)) {
@@ -287,8 +327,10 @@ void eval(void)
 		    vec_pop_back(WS);
 		} else if (LIST(temp)) {
 		    list = (Stack *)temp;
+		    stk_add(PS, ')');
 		    for (j = vec_size(list), i = 0; i < j; i++)
 			stk_add(PS, vec_at(list, i));
+		    stk_add(PS, '(');
 		    vec_pop_back(WS);
 		}
 		break;
@@ -299,6 +341,27 @@ void eval(void)
 		proc = foreign((char *)(temp & ~BIT_IDENT));
 		assert(proc);
 		(*proc)();
+		break;
+    case '%'  : assert(vec_size(WS) && vec_size(IDX));
+		temp = vec_back(WS);
+		assert(!SPECIAL(temp) && WORD(temp));
+		ptr = (char *)(temp & ~BIT_IDENT);
+		vec_pop_back(WS);
+		temp = vec_size(WS) ? vec_back(WS) : 0;
+		if (!temp || SPECIAL(temp) || WORD(temp))
+		    local(ptr, temp);
+		else {
+		    copy((Stack *)temp, &list);
+		    local(ptr, (intptr_t)list);
+		}
+		break;
+    case '('  : stk_add(IDX, vec_size(LOC));
+		break;
+    case ')'  : do {
+		    vec_pop(LOC, vec_back(IDX));
+		    vec_pop_back(IDX);
+		} while ((temp = next()) == ')');
+		goto again;
 		break;
     case '*'  : assert(vec_size(WS));
 		temp = vec_back(WS);
@@ -324,6 +387,7 @@ void eval(void)
 		    vec_pop_back(WS);
 		    putchar('\n');
 		}
+		assert(!vec_size(LOC) && !vec_size(IDX));
 		break;
     case '/'  :	assert(vec_size(WS));
 		temp = vec_back(WS);
@@ -464,6 +528,23 @@ void print(void)
 
 /* -------------------------------------------------------------------------- */
 
+void init()
+{
+    mem_init();
+    t = str2word("t");
+    f = str2word("f");
+    s = str2word("s");
+    w = str2word("w");
+    l = str2word("l");
+    stk_init(WS);
+    stk_init(PS);
+    stk_init(LOC);
+    stk_init(IDX);
+    MEM = kh_init(Symbol);
+    FFI = kh_init(Foreign);
+    init_ffi();
+}
+
 int main(int argc, char *argv[])
 {
     char *ptr;
@@ -483,18 +564,8 @@ int main(int argc, char *argv[])
 	}
     }
     setbuf(stdout, 0);
-    mem_init();
+    init();
     atexit(free_rest);
-    t = str2word("t");
-    f = str2word("f");
-    s = str2word("s");
-    w = str2word("w");
-    l = str2word("l");
-    stk_init(WS);
-    stk_init(PS);
-    MEM = kh_init(Symbol);
-    FFI = kh_init(Foreign);
-    init_ffi();
     for (;;) {
 	if (!vec_size(PS))
 	    if (read(), debugging)

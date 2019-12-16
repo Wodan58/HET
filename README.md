@@ -26,6 +26,7 @@ Special | Arity | Description
 ------- | ----- | --------------------------------------------------------------
 `!` | 1/0 | Move an item from the WS to the PS, unpacking list items.
 `$` | 1/0 | Execute a foreign function. _Addition_
+`%` | 2/1 | Create a new local name and assign the next item from the WS. _Addition_
 `#` | 0/0 | Ignore the rest of the line. _Addition_
 `*` | 1/1 | Replace a word on the WS with its definition.
 `+` | 2/1 | Add an item to a list.

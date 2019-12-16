@@ -28,8 +28,8 @@ The empty list, `()`, is internally represented with an intptr_t that has all
 bits set to zero, or as a pointer to a list with no entries. The two are
 treated as equal by `=`.
 
-Specials `+` and `/` destroy the list they are working on; `!` and `:` make
-a shallow copy. Specials '.' and ';' can operate on an empty WS; all other
+Specials `+` and `/` destroy the list they are working on; `!`, ':' and `%`
+make a shallow copy. Specials '.' and ';' can operate on an empty WS; all other
 specials require at least one item on the WS.
 
 Behaviour that is not expected is captured with an assert statement unless
@@ -55,7 +55,7 @@ can help to do the marking phase without using the recursion stack. At this
 moment I don't see any deep data structures that warrant such an implementation.
 
 Another limitation is in the character set that can be used to build a word.
-This is currently limited to alphanumerics and the hyphen character. If it
+This is currently limited to alphanumerics and the underscore character. If it
 becomes necessary to write floating point literals, then some more characters
 should be allowed in a name, but at this moment no floating point literals are
 needed.
