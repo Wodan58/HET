@@ -28,8 +28,8 @@ The empty list, `()`, is internally represented with an intptr_t that has all
 bits set to zero, or as a pointer to a list with no entries. The two are
 treated as equal by `=`.
 
-Specials `+` and `/` destroy the list they are working on; `!`, ':' and `%`
-make a shallow copy. Specials '.' and ';' can operate on an empty WS; all other
+Specials `+` and `/` destroy the list they are working on; `!`, `:` and `%`
+make a shallow copy. Specials `.` and `;` can operate on an empty WS; all other
 specials require at least one item on the WS.
 
 Behaviour that is not expected is captured with an assert statement unless

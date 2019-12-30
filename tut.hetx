@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.9
-    date    : 12/09/19
+    version : 1.10
+    date    : 12/30/19
 */
 #include "lib.hetx"
 
@@ -15,3 +15,4 @@ true false or true and not put_bool .
 (11 false X 44) last .
 3 (1 5 3 4 2) member put_bool .
 3 (1 5 6 4 2) member put_bool .
+(1 2 3 4) dup sum put space putch product .

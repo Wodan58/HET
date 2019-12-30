@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.4
-    date    : 11/25/19
+    version : 1.5
+    date    : 12/30/19
 */
 #include <stdio.h>
 #include <string.h>
@@ -165,6 +165,9 @@ void mem_exit(void)
     kh_destroy(Backup, MEM);
 }
 
+/*
+    Check whether malloc returns 0.
+*/
 void *chk_malloc(size_t size)
 {
     void *ptr;
@@ -174,6 +177,9 @@ void *chk_malloc(size_t size)
     return ptr;
 }
 
+/*
+    Check whether realloc returns 0.
+*/
 void *chk_realloc(void *old, size_t size)
 {
     void *ptr;

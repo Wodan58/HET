@@ -127,11 +127,7 @@ typedef unsigned long long khint64_t;
 #endif
 #endif /* klib_unused */
 
-#if LONG_MAX == 2147483647
 typedef khint32_t khint_t;
-#else
-typedef khint64_t khint_t;
-#endif
 typedef khint_t khiter_t;
 
 #define __ac_isempty(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&2)
@@ -548,7 +544,7 @@ static kh_inline khint_t __ac_Wang_hash(khint_t key)
 		code;												\
 	} }
 
-/* More conenient interfaces */
+/* More convenient interfaces */
 
 /*! @function
   @abstract     Instantiate a hash set containing integer keys
