@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.9
-    date    : 12/30/19
+    version : 1.10
+    date    : 01/06/20
 */
 ( true t : ;
   false f : ;
@@ -83,3 +83,11 @@ step_rec) sum : ;
   (mul) prog : ;		# program
 step_rec) product : ;
 #define product		product * !
+
+(swap +) cons : ;
+#define cons		cons * !
+
+(/ swap) uncons : ;
+#define uncons		uncons * !
+
+#define putsp		put space putch

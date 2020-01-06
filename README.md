@@ -35,9 +35,9 @@ Special | Arity | Description
 `:` | 2/1 | Take a word and an item from the WS and store the assignment in MEM.
 `;` | 1/0 | Remove an item from the WS.
 `<` | 1/1 | Take a word from the WS and push a list with the characters of the word.
-`=` | 2/1 | Take the top two items from the WS and push t or f depending on equality.
+`=` | 2/1 | Take the top two items from the WS and push `t` or `f` depending on equality.
 `>` | 1/1 | Take a list of characters from the WS and push the concatenated word.
-`?` | 1/1 | Take an item from the WS and push its type: w, l, or s.
+`?` | 1/1 | Take an item from the WS and push its type: `w`, `l`, or `s`.
 
 Changes
 -------
@@ -50,8 +50,8 @@ Additions
 ---------
 
 The document allows debug output, so I am adding `.`, allowing normal output
-and making debug output optional. `#` can be used to comment out the rest of
-the line. `$` adds foreign functions.
+and making debug output optional; `#` can be used to comment out the rest of
+the line; `$` adds foreign functions.
 
 Installation
 ------------
@@ -61,7 +61,7 @@ There is a [bootable floppy image](https://forth.hcc.nl/w/uploads/Agenda/HET_flo
 Install and start [DOSBox](https://www.dosbox.com). At the prompt type:
 `boot c:/HET_flop_image` or whatever.
 
-The version presented here can be build with these commands:
+The version presented here can be built with these commands:
 
     cmake .
     cmake --build .

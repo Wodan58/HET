@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.10
-    date    : 12/30/19
+    version : 1.11
+    date    : 01/06/20
 */
 #include "lib.hetx"
 
@@ -16,3 +16,7 @@ true false or true and not put_bool .
 3 (1 5 3 4 2) member put_bool .
 3 (1 5 6 4 2) member put_bool .
 (1 2 3 4) dup sum put space putch product .
+111 (222 333) cons .
+(11 22 33 44 55) uncons uncons putsp putsp .
+(a b) (d e f) concat dup .
+uncons uncons c swap cons cons cons dup .
