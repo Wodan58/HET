@@ -1,7 +1,7 @@
 /*
     module  : less.c
-    version : 1.1
-    date    : 11/04/19
+    version : 1.2
+    date    : 01/13/20
 */
 
 /**
@@ -15,22 +15,15 @@ void do_less(void)
     char *first, *second;
 
     assert(vec_size(WS) > 1);
-    second = (char *)(vec_back(WS) & ~BIT_IDENT);
-    vec_pop_back(WS);
-    first = (char *)(vec_back(WS) & ~BIT_IDENT);
+    second = (char *)(vec_pop(WS) & ~BIT_IDENT);
+    first = (char *)(vec_pop(WS) & ~BIT_IDENT);
     if (isdigit(*first) && isdigit(*second)) {
 	leng1 = strlen(first);
 	leng2 = strlen(second);
 	if (leng1 != leng2) {
-	    if (leng1 < leng2)
-		vec_back(WS) = t;
-	    else
-		vec_back(WS) = f;
+	    stk_push(WS, leng1 < leng2 ? t : f);
 	    return;
 	}
     }
-    if (strcmp(first, second) < 0)
-	vec_back(WS) = t;
-    else
-	vec_back(WS) = f;
+    stk_push(WS, strcmp(first, second) < 0 ? t : f);
 }

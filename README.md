@@ -15,7 +15,8 @@ Overview
 HET looks like an imperative version of [Joy](https://github.com/Wodan58/joy1).
 The abstract machine that the language implements offers a working stack (WS),
 a program stack (PS), and memory (MEM).
-The datatypes of the language are: word, list, and 10 specials.
+The datatypes of the language are: word, list, and 16 special characters.
+Whitespace characters are needed to separate words from each other.
 
 ![Datatypes](graph.jpg)
 
@@ -51,7 +52,7 @@ Additions
 
 The document allows debug output, so I am adding `.`, allowing normal output
 and making debug output optional; `#` can be used to comment out the rest of
-the line; `$` adds foreign functions.
+the line; `$` adds foreign functions; `%` adds local definitions.
 
 Installation
 ------------

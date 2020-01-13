@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.11
-    date    : 01/06/20
+    version : 1.12
+    date    : 01/13/20
 */
 #include "lib.hetx"
 
@@ -20,3 +20,5 @@ true false or true and not put_bool .
 (11 22 33 44 55) uncons uncons putsp putsp .
 (a b) (d e f) concat dup .
 uncons uncons c swap cons cons cons dup .
+dup length .
+reverse length .

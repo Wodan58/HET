@@ -1,7 +1,7 @@
 /*
     module  : putch.c
-    version : 1.1
-    date    : 12/30/19
+    version : 1.2
+    date    : 01/13/20
 */
 
 /**
@@ -13,7 +13,6 @@ void do_putch(void)
     char *ptr;
 
     assert(vec_size(WS));
-    ptr = (char *)(vec_back(WS) & ~BIT_IDENT);
+    ptr = (char *)(vec_pop(WS) & ~BIT_IDENT);
     printf("%c", atoi(ptr));
-    vec_pop_back(WS);
 }

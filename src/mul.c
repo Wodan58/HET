@@ -1,7 +1,7 @@
 /*
     module  : mul.c
-    version : 1.1
-    date    : 10/26/19
+    version : 1.2
+    date    : 01/13/20
 */
 
 /**
@@ -13,10 +13,9 @@ void do_mul(void)
     char *first, *second, *result;
 
     assert(vec_size(WS) > 1);
-    second = (char *)(vec_back(WS) & ~BIT_IDENT);
-    vec_pop_back(WS);
-    first = (char *)(vec_back(WS) & ~BIT_IDENT);
+    second = (char *)(vec_pop(WS) & ~BIT_IDENT);
+    first = (char *)(vec_pop(WS) & ~BIT_IDENT);
     result = mem_malloc(strlen(first) + strlen(second) + 1);
     sprintf(result, "%d", atoi(first) * atoi(second));
-    vec_back(WS) = (intptr_t)result | BIT_IDENT;
+    stk_push(WS, (intptr_t)result | BIT_IDENT);
 }

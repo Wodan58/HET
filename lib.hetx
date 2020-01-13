@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.10
-    date    : 01/06/20
+    version : 1.11
+    date    : 01/13/20
 */
 ( true t : ;
   false f : ;
@@ -69,18 +69,18 @@ step_rec) member : ;
 (a % a *) dup : ;
 #define dup		dup * !
 
-( list : ;			# old list
-  0				# initial value
-  (add) prog : ;		# program
+( list : ;		# old list
+  0			# initial value
+  (add) prog : ;	# program
 step_rec) sum : ;
 #define sum		sum * !
 
 32 space : ;
 #define space		space *
 
-( list : ;			# old list
-  1				# initial value
-  (mul) prog : ;		# program
+( list : ;		# old list
+  1			# initial value
+  (mul) prog : ;	# program
 step_rec) product : ;
 #define product		product * !
 
@@ -91,3 +91,9 @@ step_rec) product : ;
 #define uncons		uncons * !
 
 #define putsp		put space putch
+
+( list : ;		# old list
+  0			# initial value
+  (; 1 add) prog : ;	# program
+step_rec) length : ;
+#define length		length * !

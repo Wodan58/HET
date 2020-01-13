@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.7
-    date    : 12/16/19
+    version : 1.8
+    date    : 01/13/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -12,8 +12,8 @@
 #include <inttypes.h>
 #include "rmalloc.h"
 #include "khash.h"
+#include "kvec.h"
 #include "memory.h"
-#include "vector.h"
 
 #define BIT_IDENT	1
 #define MAX_IDENT	100
@@ -41,12 +41,12 @@ KHASH_MAP_INIT_STR(Foreign, proc_t);
 
 static khash_t(Foreign) *FFI;	/* foreign function interface */
 
-typedef struct nameval {
+typedef struct name_val {
     char *name;
     intptr_t value;
-} nameval;
+} name_val;
 
-typedef vector(nameval) Local;
+typedef vector(name_val) Local;
 
 static Local *LOC;		/* local definitions/variables */
 
@@ -54,37 +54,23 @@ typedef vector(int) Index;
 
 static Index *IDX;		/* frame pointers */
 
-void readlist(void);
-void marklist(Stack *List);
+void gc(void);
+int yylex(void);
+void readfactor(int ch);
+void markfactor(intptr_t Value);
 void writefactor(intptr_t Value);
-
-void reverse(Stack *list)
-{
-    int i, j;
-    intptr_t *PValue1, *PValue2, Temp;
-
-    for (i = 0, j = vec_size(list) - 1; i < j; i++, j--) {
-	PValue2 = &vec_at(list, j);
-	PValue1 = &vec_at(list, i);
-	Temp = *PValue1;
-	*PValue1 = *PValue2;
-	*PValue2 = Temp;
-    }
-}
-
-void copy(Stack *v, Stack **w)
-{
-    (*w) = mem_malloc(sizeof(*v));
-    if (!((*w)->m = (*w)->n = v->n))
-	(*w)->m = 1;
-    (*w)->a = mem_malloc(sizeof(*v->a) * (*w)->m);
-    if (v->n)
-	memcpy((*w)->a, v->a, sizeof(*v->a) * v->n);
-}
 
 #include "builtin.h"
 
 /* -------------------------------------------------------------------------- */
+
+void marklist(Stack *List)
+{
+    int i;
+
+    for (i = vec_size(List) - 1; i >= 0; i--)
+	markfactor(vec_at(List, i));
+}
 
 void markfactor(intptr_t Value)
 {
@@ -99,18 +85,10 @@ void markfactor(intptr_t Value)
     }
 }
 
-void marklist(Stack *List)
+void gc(void)
 {
     int i;
-
-    for (i = vec_size(List) - 1; i >= 0; i--)
-	markfactor(vec_at(List, i));
-}
-
-void do_gc(void)
-{
-    int i;
-    nameval nv;
+    name_val nv;
     khiter_t key;
 
     mark(t & ~BIT_IDENT);
@@ -136,10 +114,10 @@ void do_gc(void)
 void free_rest(void)
 {
     scan();
-    stk_free(WS);
-    stk_free(PS);
-    stk_free(LOC);
-    stk_free(IDX);
+    vec_destroy(WS);
+    vec_destroy(PS);
+    vec_destroy(LOC);
+    vec_destroy(IDX);
     kh_destroy(Symbol, MEM);
     kh_destroy(Foreign, FFI);
     mem_exit();
@@ -154,17 +132,16 @@ intptr_t str2word(char *str)
 
 intptr_t ch2word(int ch)
 {
-    char str[2];
+    static char str[2];
 
     str[0] = ch;
-    str[1] = 0;
     return (intptr_t)mem_strdup(str) | BIT_IDENT;
 }
 
 intptr_t lookup(char *str)
 {
     int i;
-    nameval nv;
+    name_val nv;
     khiter_t key;
     intptr_t value = 0;
 
@@ -189,11 +166,11 @@ void enter(char *str, intptr_t value)
 
 void local(char *str, intptr_t value)
 {
-    nameval nv;
+    name_val nv;
 
     nv.name = str;
     nv.value = value;
-    stk_add(LOC, nv);
+    stk_push(LOC, nv);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -219,7 +196,6 @@ void inter(char *str, proc_t value)
 
 void init_ffi(void)
 {
-    inter("gc", do_gc);
 #include "builtin.c"
 }
 
@@ -259,31 +235,30 @@ retry:
     return 0;
 }
 
-void readfactor(int ch)
-{
-    if (ch == '(')
-	readlist();
-    else if (SPECIAL(ch))
-	stk_add(PS, ch);
-    else
-	stk_add(PS, (intptr_t)mem_strdup(ident) | BIT_IDENT);
-}
-
 void readlist(void)
 {
     int ch;
     Stack *list = 0;
 
     if ((ch = yylex()) != ')') {
-	vec_init(list);
 	do {
 	    readfactor(ch);
-	    vec_add(list, vec_back(PS));
-	    vec_pop_back(PS);
+	    vec_push(list, vec_pop(PS));
 	} while ((ch = yylex()) != ')');
-	reverse(list);
+	vec_push(list, 0);
+	vec_reverse(list);
     }
-    stk_add(PS, (intptr_t)list);
+    stk_push(PS, (intptr_t)list);
+}
+
+void readfactor(int ch)
+{
+    if (ch == '(')
+	readlist();
+    else if (SPECIAL(ch))
+	stk_push(PS, ch);
+    else
+	stk_push(PS, (intptr_t)mem_strdup(ident) | BIT_IDENT);
 }
 
 void read(void)
@@ -293,20 +268,15 @@ void read(void)
     do
 	readfactor(ch = yylex());
     while (ch != '.' && ch != ';');
-    reverse(PS);
+    stk_push(PS, 0);
+    vec_reverse(PS);
 }
 
 /* -------------------------------------------------------------------------- */
 
 intptr_t next(void)
 {
-    intptr_t value = 0;
-
-    if (vec_size(PS)) {
-	value = vec_back(PS);
-	vec_pop_back(PS);
-    }
-    return value;
+    return vec_size(PS) ? vec_pop(PS) : 0;
 }
 
 void eval(void)
@@ -321,113 +291,99 @@ void eval(void)
 again:
     switch (temp) {
     case '!'  : assert(vec_size(WS));
-		temp = vec_back(WS);
-		if (SPECIAL(temp)) {
-		    stk_add(PS, temp);
-		    vec_pop_back(WS);
-		} else if (LIST(temp)) {
+		temp = vec_pop(WS);
+		if (SPECIAL(temp))
+		    stk_push(PS, temp);
+		else if (WORD(temp))
+		    vec_push(WS, temp);
+		else {
 		    list = (Stack *)temp;
-		    stk_add(PS, ')');
-		    for (j = vec_size(list), i = 0; i < j; i++)
-			stk_add(PS, vec_at(list, i));
-		    stk_add(PS, '(');
-		    vec_pop_back(WS);
+		    stk_push(PS, ')');
+		    for (i = 0, j = vec_size(list); i < j; i++)
+			stk_push(PS, vec_at(list, i));
+		    stk_push(PS, '(');
 		}
 		break;
     case '$'  : assert(vec_size(WS));
-		temp = vec_back(WS);
-		vec_pop_back(WS);
+		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
 		proc = foreign((char *)(temp & ~BIT_IDENT));
 		assert(proc);
 		(*proc)();
 		break;
     case '%'  : assert(vec_size(WS) && vec_size(IDX));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
-		ptr = (char *)(temp & ~BIT_IDENT);
-		vec_pop_back(WS);
+		ptr = (char *)(temp & ~BIT_IDENT);	
 		temp = vec_size(WS) ? vec_back(WS) : 0;
 		if (!temp || SPECIAL(temp) || WORD(temp))
 		    local(ptr, temp);
 		else {
-		    copy((Stack *)temp, &list);
+		    vec_copy(list, (Stack *)temp);
 		    local(ptr, (intptr_t)list);
 		}
 		break;
-    case '('  : stk_add(IDX, vec_size(LOC));
+    case '('  : stk_push(IDX, vec_size(LOC));
 		break;
-    case ')'  : do {
-		    vec_pop(LOC, vec_back(IDX));
-		    vec_pop_back(IDX);
-		} while ((temp = next()) == ')');
+    case ')'  : do
+		    vec_setsize(LOC, vec_pop(IDX));
+		while ((temp = next()) == ')');
 		goto again;
 		break;
     case '*'  : assert(vec_size(WS));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
-		vec_back(WS) = lookup((char *)(temp & ~BIT_IDENT));
+		stk_push(WS, lookup((char *)(temp & ~BIT_IDENT)));
 		break;
     case '+'  : assert(vec_size(WS));
-		value = vec_back(WS);
-		vec_pop_back(WS);
-		temp = vec_size(WS) ? vec_back(WS) : 0;
+		value = vec_pop(WS);
+		temp = vec_size(WS) ? vec_pop(WS) : 0;
 		assert(!SPECIAL(temp) && LIST(temp));
-		if ((list = (Stack *)temp) == 0)
-		    vec_init(list);
-		vec_add(list, value);
-		temp = (intptr_t)list;
-		if (vec_size(WS))
-		    vec_back(WS) = temp;
-		else
-		    stk_add(WS, temp);
+		list = (Stack *)temp;
+		vec_push(list, value);
+		stk_push(WS, (intptr_t)list);
 		break;
     case '.'  : if (vec_size(WS)) {
-		    writefactor(vec_back(WS));
-		    vec_pop_back(WS);
+		    writefactor(vec_pop(WS));
 		    putchar('\n');
 		}
 		assert(!vec_size(LOC) && !vec_size(IDX));
 		break;
     case '/'  :	assert(vec_size(WS));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
 		assert(vec_size(list));
-		temp = vec_back(list);
-		vec_pop_back(list);
-		vec_back(WS) = (intptr_t)list;
-		stk_add(WS, temp);
+		temp = vec_pop(list);
+		stk_push(WS, (intptr_t)list);
+		stk_push(WS, temp);
 		break;
     case ':'  : assert(vec_size(WS));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && WORD(temp));
 		ptr = (char *)(temp & ~BIT_IDENT);
-		vec_pop_back(WS);
 		temp = vec_size(WS) ? vec_back(WS) : 0;
 		if (!temp || SPECIAL(temp) || WORD(temp))
 		    enter(ptr, temp);
 		else {
-		    copy((Stack *)temp, &list);
+		    vec_copy(list, (Stack *)temp);
 		    enter(ptr, (intptr_t)list);
 		}
 		break;
     case ';'  : if (vec_size(WS))
-		    vec_pop_back(WS);
+		    vec_pop(WS);
 		break;
     case '<'  : assert(vec_size(WS));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		assert(temp & BIT_IDENT);
-		vec_init(list);
 		ptr = (char *)(temp & ~BIT_IDENT);
-		for (i = strlen(ptr) - 1; i >= 0; i--)
-		    vec_add(list, ch2word(ptr[i]));
-		vec_back(WS) = (intptr_t)list;
+		for (list = 0, i = strlen(ptr) - 1; i >= 0; i--)
+		    vec_push(list, ch2word(ptr[i]));
+		stk_push(WS, (intptr_t)list);
 		break;
     case '='  : assert(vec_size(WS));
-		value = vec_back(WS);
-		vec_pop_back(WS);
-		temp = vec_size(WS) ? vec_back(WS) : 0;
+		value = vec_pop(WS);
+		temp = vec_size(WS) ? vec_pop(WS) : 0;
 	        if (SPECIAL(value)) {
 		    if (SPECIAL(temp))
 			temp = temp == value ? t : f;
@@ -446,13 +402,10 @@ again:
 		    temp = t;
 		else
 		    temp = f;
-		if (vec_size(WS))
-		    vec_back(WS) = temp;
-		else
-		    stk_add(WS, temp);
+		stk_push(WS, temp);
 		break;
     case '>'  : assert(vec_size(WS));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
 		ptr = mem_malloc(vec_size(list) + 1);
@@ -463,18 +416,19 @@ again:
 		    ptr[j++] = *str;
 		}
 		ptr[j] = 0;
-		vec_back(WS) = (intptr_t)ptr | BIT_IDENT;
+		stk_push(WS, (intptr_t)ptr | BIT_IDENT);
 		break;
     case '?'  : assert(vec_size(WS));
-		temp = vec_back(WS);
+		temp = vec_pop(WS);
 		if (SPECIAL(temp))
-		    vec_back(WS) = s;
+		    temp = s;
 		else if (WORD(temp))
-		    vec_back(WS) = w;
+		    temp = w;
 		else
-		    vec_back(WS) = l;
+		    temp = l;
+		stk_push(WS, temp);
 		break;
-    default   :	stk_add(WS, temp);
+    default   :	stk_push(WS, temp);
 		break;
     }
 }
@@ -486,12 +440,11 @@ void writelist(Stack *List)
     int i;
 
     printf("(");
-    if (List)
-	for (i = vec_size(List) - 1; i >= 0; i--) {
-	    writefactor(vec_at(List, i));
-	    if (i)
-		putchar(' ');
-	}
+    for (i = vec_size(List) - 1; i >= 0; i--) {
+	writefactor(vec_at(List, i));
+	if (i)
+	    putchar(' ');
+    }
     printf(")");
 }
 
@@ -515,8 +468,10 @@ void print(void)
 	writefactor(vec_at(WS, i));
 	putchar(' ');
     }
-    if (j || k)
-	putchar('_');
+    if (j || k) {
+	putchar('-');
+	putchar('-');
+    }
     for (i = k - 1; i >= 0; i--) {
 	putchar(' ');
 	writefactor(vec_at(PS, i));
@@ -528,7 +483,7 @@ void print(void)
 
 /* -------------------------------------------------------------------------- */
 
-void init()
+void init(void)
 {
     mem_init();
     t = str2word("t");
