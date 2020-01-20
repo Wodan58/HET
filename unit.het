@@ -1,7 +1,7 @@
 #
 #   module  : unit.het
-#   version : 1.3
-#   date    : 12/02/19
+#   version : 1.4
+#   date    : 01/20/20
 #
 
 # push and execute word
@@ -41,8 +41,8 @@ aap aap = .
 # compare two lists
 () = .
 
-# compare two specials
-(a : ; b : ; a * b *) swap : ;
+# compare two specials, collect garbage
+(a % ; b % ; gc $ a * b *) swap : ;
 (;) / (;) / swap * ! ; = . ;
 
 # convert a list to a word
@@ -70,5 +70,11 @@ semi (;) / swap * ! ; = .
 # compare list and word
 empty = .
 
+# compare word and list
+empty () = .
+
 # lists cannot be compared with =
 (1 2 3) (1 2 3) = .
+
+# test less
+10 9 less $ .

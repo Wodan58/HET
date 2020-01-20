@@ -42,8 +42,8 @@ int main()
 
 /*
     module  : kvec.h
-    version : 1.1
-    date    : 01/13/20
+    version : 1.2
+    date    : 01/20/20
 
  1. Change type of n, m from size_t to unsigned. Reason: takes less memory.
  2. Remove (type*) casts. Reason: not needed for C.
@@ -71,6 +71,9 @@ int main()
 20. Add macro vec_equal. Reason: part of the requirements of the vector type.
 21. Add macro vec_reverse. Reason: more convenient than as function.
 22. Add automatic initialization in vec_copy. Reason: more convenient interface.
+23. Rename vec_resize to vec_grow. Reason: vector can only grow.
+24. Add vec_shrink macro. Reason: reduce memory footprint of large vectors.
+25. Add vec_end macro. Reason: can be used as stack pointer.
 
   2008-09-22 (0.1.0):
 	* The initial version.
@@ -85,11 +88,15 @@ int main()
 #define vec_at(v, i)		((v)->a[(i)])
 #define vec_pop(v)		((v)->a[--(v)->n])
 #define vec_back(v)		((v)->a[(v)->n - 1])
+#define vec_end(v)		((v)->a + (v)->n)
 #define vec_size(v)		((v) ? (v)->n : 0)
 #define vec_setsize(v, s)	((v)->n = (s))
 #define vec_max(v)		((v)->m)
-#define vec_resize(v, s)	((v)->m = (s), (v)->a = mem_realloc((v)->a, \
+#define vec_grow(v, s)		((v)->m = (s), (v)->a = mem_realloc((v)->a, \
 				sizeof(*(v)->a) * (v)->m))
+#define vec_shrink(v)		do { if ((v)->n) { ((v)->m = (v)->n; (v)->a = \
+				mem_realloc((v)->a, sizeof(*(v)->a) * (v)->m));\
+				} } while (0)
 #define vec_equal(v, w)		((v)->n == (w)->n && !memcmp((v)->a, (w)->a, \
 				sizeof(*(v)) * (v)->n))
 
@@ -97,7 +104,7 @@ int main()
 #define vec_copy(v1, v0) 						\
 	do {								\
 	    vec_init((v1));						\
-	    if ((v1)->m < (v0)->n) vec_resize(v1, (v0)->n);		\
+	    if ((v1)->m < (v0)->n) vec_grow(v1, (v0)->n);		\
 	    (v1)->n = (v0)->n;						\
 	    memcpy((v1)->a, (v0)->a, sizeof(*(v0)->a) * (v0)->n);	\
 	} while (0)

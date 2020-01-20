@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.8
-    date    : 01/13/20
+    version : 1.9
+    date    : 01/20/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -295,7 +295,7 @@ again:
 		if (SPECIAL(temp))
 		    stk_push(PS, temp);
 		else if (WORD(temp))
-		    vec_push(WS, temp);
+		    stk_push(WS, temp);
 		else {
 		    list = (Stack *)temp;
 		    stk_push(PS, ')');
@@ -349,7 +349,7 @@ again:
 		}
 		assert(!vec_size(LOC) && !vec_size(IDX));
 		break;
-    case '/'  :	assert(vec_size(WS));
+    case '/'  : assert(vec_size(WS));
 		temp = vec_pop(WS);
 		assert(!SPECIAL(temp) && LIST(temp));
 		list = (Stack *)temp;
@@ -428,7 +428,7 @@ again:
 		    temp = l;
 		stk_push(WS, temp);
 		break;
-    default   :	stk_push(WS, temp);
+    default   : stk_push(WS, temp);
 		break;
     }
 }

@@ -1,24 +1,73 @@
 /*
     module  : tut.hetx
-    version : 1.12
-    date    : 01/13/20
+    version : 1.13
+    date    : 01/20/20
 */
 #include "lib.hetx"
 
+/*
+                H E T   T U T O R I A L
+
+HET is an imperative language that can be used to implement JOY.
+
+JOY is a functional language which uses postfix-like notation
+and operates on a stack.
+The base types of HET are symbols. A list of values of any type
+is a value of type list.
+*/
+
+/* push two numbers onto stack, add them, write result */
 111 222 add .
+/* add two numbers, add another two numbers, write product */
 1 2 add 3 4 add mul .
+/* testing whether 2 + 2 = 2 * 2 */
 2 2 add 2 2 mul = put_bool .
+/* testing whether 6 * 6 > 5 * 7 */
 6 6 mul 5 7 mul greater put_bool .
+/* Boolean operations */
 true false or true and not put_bool .
+
+/* LISTS */
+
+/* push a list of numbers, reverse it, write result */
 (1 2 3 4 5) reverse .
+/* push two lists of symbols, concatenate, write result */
 (peter paul) (mary jane) concat .
+/* push a list of mixed values, write its last element */
 (11 false X 44) last .
+/* push a number and a list, determine membership */
 3 (1 5 3 4 2) member put_bool .
+/* similar */
 3 (1 5 6 4 2) member put_bool .
+/* push a list of numbers, duplicate to find sum and product */
 (1 2 3 4) dup sum put space putch product .
+/* push a number and a list of numbers, cons together */
 111 (222 333) cons .
+/* push a list, uncons twice, write remainder and first two */
 (11 22 33 44 55) uncons uncons putsp putsp .
-(a b) (d e f) concat dup .
-uncons uncons c swap cons cons cons dup .
+/* push two lists of characters, concatenate them */
+(a b) (d e f) concat
+/* now write result, but dup first so list is not lost */
+dup .
+/* insert the missing c */
+uncons uncons c swap cons cons cons
+/* now check */
+dup .
+/* what is its length ? */
 dup length .
+/* reverse it, write its length */
 reverse length .
+/* So, the length of a list is also the length of its reverse:
+                length  ==  reverse length
+*/
+
+/* INPUT from terminal or input file */
+get get add .
+123 456
+
+/* COMBINATORS */
+
+/*
+Combinators are operations which expect a list on top
+of the stack and then execute it as a program.
+*/

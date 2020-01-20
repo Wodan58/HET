@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.11
-    date    : 01/13/20
+    version : 1.12
+    date    : 01/20/20
 */
 ( true t : ;
   false f : ;
@@ -14,6 +14,7 @@
 #define less		less $
 #define put		put $
 #define putch		putch $
+#define get		get $
 
 (a % ; b % ; a * b *) swap : ;
 #define swap		swap * !
