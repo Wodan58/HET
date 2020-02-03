@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.13
-    date    : 01/20/20
+    version : 1.14
+    date    : 02/02/20
 */
 #include "lib.hetx"
 
@@ -71,3 +71,16 @@ get get add .
 Combinators are operations which expect a list on top
 of the stack and then execute it as a program.
 */
+/* push two numbers and a program, i-combinator to execute */
+111 222 (add put) i nl .
+/* i-combinator to execute [+ put] on top of stack */
+111 (add put) /* reverse */ 222 swap i nl .
+/* dip-combinator to multiply 3 and 7, then add 100 */
+3 7 100 (mul) dip add .
+/* step-combinator to apply program to each member of list */
+(1 2 3) (dup mul putsp) step nl .
+
+/* i-combinator, twice-combinator, thrice-combinator */
+2 (dup mul) i .
+2 (dup mul) twice .
+2 (dup mul) thrice .

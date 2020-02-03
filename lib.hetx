@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.12
-    date    : 01/20/20
+    version : 1.13
+    date    : 02/02/20
 */
 ( true t : ;
   false f : ;
@@ -98,3 +98,21 @@ step_rec) product : ;
   (; 1 add) prog : ;	# program
 step_rec) length : ;
 #define length		length * !
+
+10 newline : ;
+#define newline		newline *
+
+#define nl		newline putch
+#define i		!
+
+(a % ; b % ; a * ! b *) dip : ;
+#define dip		dip * !
+
+((!) dip !) B : ;
+#define B		B * !
+
+(dup B) twice : ;
+#define twice		twice * !
+
+(dup (twice) dip !) thrice : ;
+#define thrice		thrice * !
