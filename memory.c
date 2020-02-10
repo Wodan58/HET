@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.5
-    date    : 12/30/19
+    version : 1.6
+    date    : 02/10/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -28,10 +28,10 @@ static intptr_t allocated, max_alloc;
 /*
     Report a fatal error and abort execution.
 */
-void fatal(char *str)
+void mem_fatal(void)
 {
-    fprintf(stderr, "%s\n", str);
-    exit(1);
+    fprintf(stderr, "Out of memory\n");
+    abort();
 }
 
 /*
@@ -116,7 +116,7 @@ char *mem_strdup(char *str)
     allocated += strlen(str) + 1;
     do
 	if ((temp = (intptr_t)strdup(str)) == 0)
-	    fatal("Out of memory");
+	    mem_fatal();
     while (SPECIAL(temp));
     remind(temp);
     return (char *)temp;
@@ -132,7 +132,7 @@ void *mem_malloc(size_t size)
     allocated += size;
     do
 	if ((temp = (intptr_t)malloc(size)) == 0)
-	    fatal("Out of memory");
+	    mem_fatal();
     while (SPECIAL(temp));
     remind(temp);
     return (void *)temp;
@@ -148,7 +148,7 @@ void *mem_realloc(void *old, size_t size)
     allocated += size / 2;
     do
 	if ((temp = (intptr_t)realloc(old, size)) == 0)
-	    fatal("Out of memory");
+	    mem_fatal();
     while (SPECIAL(temp));
     if (temp != (intptr_t)old) {
 	forget((intptr_t)old);
@@ -173,7 +173,7 @@ void *chk_malloc(size_t size)
     void *ptr;
 
     if ((ptr = malloc(size)) == 0)
-	fatal("Out of memory");
+	mem_fatal();
     return ptr;
 }
 
@@ -185,7 +185,7 @@ void *chk_realloc(void *old, size_t size)
     void *ptr;
 
     if ((ptr = realloc(old, size)) == 0)
-	fatal("Out of memory");
+	mem_fatal();
     return ptr;
 }
 

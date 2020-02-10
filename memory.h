@@ -1,9 +1,9 @@
 /*
     module  : memory.h
-    version : 1.2
-    date    : 11/25/19
+    version : 1.3
+    date    : 02/10/20
 */
-void fatal(char *str);
+void mem_fatal(void);
 void mem_report(void);
 void mem_init(void);
 void scan(void);

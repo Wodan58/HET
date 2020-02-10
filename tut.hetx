@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.14
-    date    : 02/02/20
+    version : 1.15
+    date    : 02/10/20
 */
 #include "lib.hetx"
 
@@ -84,3 +84,11 @@ of the stack and then execute it as a program.
 2 (dup mul) i .
 2 (dup mul) twice .
 2 (dup mul) thrice .
+
+/* times-combinator, using definition square  ==  dup *    */
+2 (square) 0 times .
+2 (square) 1 times .
+2 (square) 2 times .
+2 (square) 3 times .
+2 (square) 4 times .
+2 (square) 5 times . /* note overflow */

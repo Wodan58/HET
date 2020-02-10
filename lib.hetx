@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.13
-    date    : 02/02/20
+    version : 1.14
+    date    : 02/10/20
 */
 ( true t : ;
   false f : ;
@@ -15,6 +15,7 @@
 #define put		put $
 #define putch		putch $
 #define get		get $
+#define sub		sub $
 
 (a % ; b % ; a * b *) swap : ;
 #define swap		swap * !
@@ -116,3 +117,17 @@ step_rec) length : ;
 
 (dup (twice) dip !) thrice : ;
 #define thrice		thrice * !
+
+( count *
+  () t : ;
+  (count * 1 sub count : ; prog * ! times_rec * !) f : ;
+0 = * !) times_rec : ;
+#define times_rec	times_rec * !
+
+( count : ;		# pick up count
+  prog : ;		# pick up prog
+times_rec) times : ;
+#define times		times * !
+
+(dup mul) square : ;
+#define square		square * !
