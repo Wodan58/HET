@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.15
-    date    : 02/10/20
+    version : 1.16
+    date    : 02/17/20
 */
 #include "lib.hetx"
 
@@ -92,3 +92,5 @@ of the stack and then execute it as a program.
 2 (square) 3 times .
 2 (square) 4 times .
 2 (square) 5 times . /* note overflow */
+
+(7) 10 times stack .
