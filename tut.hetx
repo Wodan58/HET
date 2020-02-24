@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.16
-    date    : 02/17/20
+    version : 1.17
+    date    : 02/24/20
 */
 #include "lib.hetx"
 
@@ -94,3 +94,5 @@ of the stack and then execute it as a program.
 2 (square) 5 times . /* note overflow */
 
 (7) 10 times stack .
+/* map-combinator to make list of squares */
+(1 2 3) (dup mul +) map .
