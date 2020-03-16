@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.16
-    date    : 02/24/20
+    version : 1.17
+    date    : 03/16/20
 */
 ( true t : ;
   false f : ;
@@ -137,3 +137,9 @@ times_rec) times : ;
   list : ;		# pick up list
 () step_rec reverse) map : ;
 #define map		map * !
+
+( prog : ;		# pick up prog
+  init : ;		# pick up init
+  list : ;		# pick up list
+init * step_rec) fold : ;
+#define fold		fold * !

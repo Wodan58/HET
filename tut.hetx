@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.17
-    date    : 02/24/20
+    version : 1.18
+    date    : 03/16/20
 */
 #include "lib.hetx"
 
@@ -96,3 +96,5 @@ of the stack and then execute it as a program.
 (7) 10 times stack .
 /* map-combinator to make list of squares */
 (1 2 3) (dup mul +) map .
+/* fold-combinator to add squares of members of list */
+(1 2 3) 0 (dup mul add) fold .
