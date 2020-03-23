@@ -83,3 +83,4 @@ But first, all of the Joy example files must be implemented in HET. It looks
 possible, but maybe there are some bears on the road.
 
 Progress is currently restricted to only one line in tut.out per week.
+This will be completed on May 1, 2020.

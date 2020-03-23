@@ -26,6 +26,12 @@ space. Of course, these programs are run without using the garbage collector.
 
  ![](fib2.jpg)
 
+The [BDW garbage collector](https://github.com/ivmai/bdwgc) makes the program
+run faster. HET is a small programming language. Adding BDW makes it larger.
+In this case it seems worth the trouble.
+
+ ![](fib13.jpg)
+
 42minjoy
 --------
 
@@ -42,7 +48,7 @@ garbage collector is used, whenever the memory array has been fully used.
 JOY
 ---
 
-The original JOY uses a copying collector that is faster than the mark/scan
+The original Joy uses a copying collector that is faster than the mark/scan
 collector used in 42minjoy. The rest is much the same as in 42minjoy.
 
  ![](fib4.jpg)
@@ -50,8 +56,8 @@ collector used in 42minjoy. The rest is much the same as in 42minjoy.
 joy1
 ----
 
-The modified version of JOY was compiled with the BDW garbage collector that
-uses a mark/scan. That makes it slower than JOY with its own builtin collector.
+The modified version of Joy was compiled with the BDW garbage collector that
+uses a mark/scan. That makes it slower than Joy with its own builtin collector.
 
  ![](fib5.jpg)
 
