@@ -1,7 +1,7 @@
 /*
     module  : tut.hetx
-    version : 1.19
-    date    : 03/23/20
+    version : 1.20
+    date    : 03/30/20
 */
 #include "lib.hetx"
 
@@ -115,3 +115,12 @@ of the stack and then execute it as a program.
 ) construct2 .
 /* now clear the stack */
 () unstack .
+
+/* DIRECTIVES */
+
+#include "tut.in1"
+/* back to original line numbering */
+
+#include "tut.in2"
+
+/* end of HET tutorial */
