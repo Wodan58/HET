@@ -41,3 +41,8 @@ false
 65
 97
 g
+Robinson
+(dup * ! rest * ! null * ! (first * !) (rest * ! last * !) branch * !)
+Robinson
+Robinson
+Robinson

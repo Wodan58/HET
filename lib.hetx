@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.18
-    date    : 03/23/20
+    version : 1.19
+    date    : 04/06/20
 */
 ( true t : ;
   false f : ;
@@ -145,7 +145,7 @@ times_rec) times : ;
 init * step_rec) fold : ;
 #define fold		fold * !
 
-(/ ;)			rest : ;
+(/ ;) rest : ;
 #define rest		rest * !
 
 (stack swap dip rest cons unstack) nullary : ;
@@ -154,10 +154,10 @@ init * step_rec) fold : ;
 (((nullary) cons dip cons) map) construct2 : ;
 #define construct2	construct2 * !
 
-(;)			pop : ;
-#define			pop * !
+(;) pop : ;
+#define	pop		pop * !
 
-(() cons)		unit : ;
+(() cons) unit : ;
 #define unit		unit * !
 
 (a % ; b % ; () b * + a * +) pair : ;
@@ -173,3 +173,36 @@ init * step_rec) fold : ;
   oldl * list :	;	# restore old list
 ) map2 : ;
 #define map2		map2 * !
+
+( list : ;		# pick up list
+  count : ;		# pick up count
+  (count *
+    (() list : ;) t : ;	# empty the list
+    (; count * 1 sub count : ;) f : ;
+  0 = * !) prog : ;	# define prog
+step_rec) index : ;
+#define index		index * !
+
+( (1) t : ;
+  (0) f : ;
+() = * !) null : ;
+#define null		null * !
+
+(/* swap */ pair index i) branch : ;
+#define branch		branch * !
+
+#undef last
+(dup rest null (first) (rest last * !) branch) last : ;
+#define last		last * !
+
+(first *) definition : ;
+#define definition	definition * !
+
+#define car		first
+#define cdr		rest
+
+(dup i) x : ;
+#define x		x * !
+
+((dup cons) swap concat dup cons i) y : ;
+#define y		y * !
