@@ -1,15 +1,26 @@
 /*
     module  : tut.in2
-    version : 1.2
-    date    : 04/06/20
+    version : 1.3
+    date    : 04/13/20
 */
 
 /* RECURSIVE FUNCTIONS, non-recursive computation */
 
+/* "last" is a tail-recursive function */
 (Smith Jones Robinson) last .
+/* now let us look at the (recursive) definition of "last" */
 (last) definition .
 (Smith Jones Robinson) (last) definition i .
+/* using the x-combinator */
 (Smith Jones Robinson)
 (swap dup rest null (car swap pop) (cdr swap x) branch) x .
+/* using the y-combinator */
 (Smith Jones Robinson)
 (swap dup rest null (car swap pop) (cdr swap i) branch) y .
+
+/* "factorial" is not tail-recursive */
+6 factorial_rec .
+/* using the x-combinator */
+6 (swap dup 2 smaller (pop pop 1) (dup pred rolldown x mul) branch) x .
+/* using the y-combinator */
+6 (swap dup 2 smaller (pop pop 1) (dup pred rolldown i mul) branch) y .

@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.19
-    date    : 04/06/20
+    version : 1.20
+    date    : 04/13/20
 */
 ( true t : ;
   false f : ;
@@ -206,3 +206,17 @@ step_rec) index : ;
 
 ((dup cons) swap concat dup cons i) y : ;
 #define y		y * !
+
+( (1) t : ;
+  (0) f : ;
+less * !) smaller : ;
+#define smaller		smaller * !
+
+(1 sub) pred : ;
+#define pred		pred * !
+
+(dup 2 smaller (; 1) (dup pred factorial_rec * ! mul) branch) factorial_rec : ;
+#define factorial_rec	factorial_rec * !
+
+((swap) dip swap) rolldown : ;
+#define rolldown	rolldown * !
