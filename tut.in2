@@ -1,7 +1,7 @@
 /*
     module  : tut.in2
-    version : 1.4
-    date    : 04/20/20
+    version : 1.5
+    date    : 04/27/20
 */
 
 /* RECURSIVE FUNCTIONS, non-recursive computation */
@@ -34,3 +34,14 @@
 
 /* now look at the definition of quicksort: */
 (quicksort) definition .
+
+/* sorting lists on first item */
+((1 Smith) (3 Jones) (2 Robinson) (4 Brown)) quicksort1 .
+/* sorting on symbol */
+()  /* initial class-list in COMPUTATIONAL CHRONOSCOPY */
+(NURKS Peter 1989 year 3 major Computer Science) +
+(ABELSON Mary 1990 year 2 major Logic) +
+(ZEEMAN Fred 1988 year 2 major Accounting) +
+(MORRIS Janna 1992 year 1 major undecided) +
+/* now sort on surname and print */
+quicksort1 (putln) step .

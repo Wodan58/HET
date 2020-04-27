@@ -1,7 +1,7 @@
 /*
     module  : lib.hetx
-    version : 1.21
-    date    : 04/20/20
+    version : 1.22
+    date    : 04/27/20
 */
 ( true t : ;
   false f : ;
@@ -237,3 +237,20 @@ less * !) smaller : ;
   (partition quicksort * ! (quicksort * !) dip concat) f : ;
 * !) quicksort : ;
 #define quicksort	quicksort * !
+
+((() ()) dip dup first first
+  (greater
+    (+) t : ;
+    (swap (+) dip) f : ;
+  * !) swap +
+(dup first) swap concat step) partition1 : ;
+#define partition1	partition1 * !
+
+(dup small
+  () t : ;
+  (partition1 quicksort1 * ! (quicksort1 * !) dip concat) f : ;
+* !) quicksort1 : ;
+#define quicksort1	quicksort1 * !
+
+(put 10 putch) putln : ;
+#define putln		putln * !
