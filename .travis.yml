@@ -4,7 +4,6 @@ compiler: gcc
 install:
   - wget https://sourceforge.net/projects/ltp/files/Coverage%20Analysis/LCOV-1.14/lcov-1.14.tar.gz
   - gem install coveralls-lcov
-  - lcov --version
   - gcc --version
 
 before_script:
