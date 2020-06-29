@@ -1,18 +1,18 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.10
-#   date    : 11/04/19
+#   version : 1.11
+#   date    : 06/07/20
 #
 cmake_minimum_required(VERSION 3.0)
 project(HET)
-add_definitions(-DMALLOC_DEBUG)
 if(WIN32)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 endif()
-add_executable(het het.c memory.c rmalloc.c)
+add_executable(het het.c gc.c)
+target_link_libraries(het m)
 add_dependencies(het always)
 add_custom_target(always
 		  COMMAND sh builtin.sh)

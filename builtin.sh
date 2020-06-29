@@ -1,7 +1,7 @@
 #
 #   module  : builtin.sh
-#   version : 1.1
-#   date    : 10/18/19
+#   version : 1.2
+#   date    : 06/07/20
 #
 #   Generate builtin.h and builtin.c
 #
@@ -26,5 +26,5 @@ fi
 if [ $todo -eq 1 ]
 then
   mv builtin.tmp builtin.h
-  sed 's/.*\///;s/\..*//;s/.*/inter("&", do_&);/' <builtin.h >builtin.c
+  sed 's/.*\///;s/\..*//;s/.*/inter(ENV, "&", do_&);/' <builtin.h >builtin.c
 fi

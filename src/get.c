@@ -1,15 +1,15 @@
 /*
     module  : get.c
-    version : 1.1
-    date    : 01/20/20
+    version : 1.3
+    date    : 06/22/20
 */
 
 /**
 get  :  ->  F
 Reads a factor from input and pushes it onto stack.
 */
-void do_get(void)
+void do_get(eval_env *ENV)
 {
-    readfactor(yylex());
+    readfactor(ENV, yylex());
 }
 /* get */

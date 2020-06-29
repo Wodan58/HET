@@ -1,7 +1,7 @@
 /*
     module  : gc.c
-    version : 1.1
-    date    : 01/13/20
+    version : 1.2
+    date    : 06/07/20
 */
 
 /**
@@ -10,6 +10,6 @@ Initiates garbage collection.
 */
 void do_gc(void)
 {
-    gc();
+    GC_gcollect();
 }
 /* gc */
