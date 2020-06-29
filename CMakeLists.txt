@@ -1,7 +1,7 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.11
-#   date    : 06/07/20
+#   version : 1.12
+#   date    : 06/29/20
 #
 cmake_minimum_required(VERSION 3.0)
 project(HET)
@@ -12,7 +12,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-cove
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 endif()
 add_executable(het het.c gc.c)
+if(WIN32)
+else()
 target_link_libraries(het m)
+endif()
 add_dependencies(het always)
 add_custom_target(always
 		  COMMAND sh builtin.sh)
