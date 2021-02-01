@@ -1,13 +1,13 @@
 HET
 ---
 
-Build|Linux|Windows|Coverage|Codecov
----|---|---|---|---
-status|[![Travis CI build status](https://travis-ci.org/Wodan58/HET.svg?branch=master)](https://travis-ci.org/Wodan58/HET)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/HET?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/HET)|[![Coverage Status](https://coveralls.io/repos/github/Wodan58/HET/badge.svg?branch=master)](https://coveralls.io/github/Wodan58/HET?branch=master)|[![Codecov](https://codecov.io/gh/Wodan58/HET/branch/master/graph/badge.svg)](https://codecov.io/gh/Wodan58/HET)
+Build|Linux|Windows|Coverity|Coverage|Codecov
+---|---|---|---|---|---
+status|[![Travis CI build status](https://travis-ci.com/Wodan58/HET.svg?branch=master)](https://travis-ci.com/Wodan58/HET)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/HET?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/HET)|[![Coverity Scan Build Status](https://img.shields.io/coverity/scan/22422.svg)](https://scan.coverity.com/projects/wodan58-het)|[![Coverage Status](https://coveralls.io/repos/github/Wodan58/HET/badge.svg?branch=master)](https://coveralls.io/github/Wodan58/HET?branch=master)|[![Codecov](https://codecov.io/gh/Wodan58/HET/branch/master/graph/badge.svg)](https://codecov.io/gh/Wodan58/HET)
 
 HET is a very simple educational programming language dating from 1976
 and described in this [document](https://ir.cwi.nl/pub/12870/12870D.pdf),
-pages 59-78 and in this [report](https://forth.hcc.nl/w/Verslag/HetLisp).
+pages 59-78 and in this [report](https://forth.hcc.nl/downloadsf/Verslag/HetLisp).
 
 Overview
 --------
@@ -57,10 +57,13 @@ the line; `$` adds foreign functions; `%` adds local definitions.
 Installation
 ------------
 
-There is a [bootable floppy image](https://forth.hcc.nl/w/uploads/Agenda/HET_flop_image) with the version from the report.
+There is a [bootable floppy-image](https://forth.hcc.nl/downloadsf/HET_flop_image) with the version from the report.
 
 Install and start [DOSBox](https://www.dosbox.com). At the prompt type:
 `boot c:/HET_flop_image` or whatever.
+
+Note: The links to the report and the floppy-image are currently dead.
+They are mentioned [here](https://forth.hcc.nl/wie-zijn-wij/2010-2014.html).
 
 The version presented here can be built with these commands:
 

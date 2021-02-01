@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.11
-    date    : 06/22/20
+    version : 1.13
+    date    : 01/12/21
 */
 #include <stdio.h>
 #include <string.h>
@@ -429,10 +429,10 @@ void print(eval_env *ENV)
 	putchar('-');
 	putchar('-');
     }
-    for (i = k - 1; i >= 0; i--) {
+    i = k - 1;
+    if (i >= 0) {
 	putchar(' ');
 	writefactor(vec_at(ENV->PS, i));
-	break;
     }
     if (j || k)
 	putchar('\n');
