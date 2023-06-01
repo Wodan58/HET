@@ -8,3 +8,5 @@ Makefile
 builtin.c
 builtin.h
 tut.het
+fib.het
+banner.sh
