@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.13
-    date    : 01/12/21
+    version : 1.14
+    date    : 08/06/23
 */
 #include <stdio.h>
 #include <string.h>
@@ -24,8 +24,7 @@
 #define MAX_IDENT	100
 
 #define SPECIAL(i)	((i) >= '!' && (i) <= '?')
-#define WORD(i)		(((i) & BIT_IDENT) != 0)
-#define LIST(i)		(((i) & BIT_IDENT) == 0)
+#define WORD(i)		((i) & BIT_IDENT)
 
 static char ident[MAX_IDENT + 1];	/* identifier */
 
@@ -198,10 +197,14 @@ void readlist(eval_env *ENV)
     if ((ch = yylex()) != ')') {
 	do {
 	    readfactor(ENV, ch);
+	    if (!list)
+		vec_init(list);
 	    vec_push(list, vec_pop(ENV->PS));
 	} while ((ch = yylex()) != ')');
-	vec_push(list, 0);
-	vec_reverse(list);
+	if (list) {
+	    vec_push(list, 0);
+	    vec_reverse(list);
+	}
     }
     vec_push(ENV->PS, (intptr_t)list);
 }
@@ -293,8 +296,10 @@ again:
     case '+'  : assert(vec_size(ENV->WS));
 		value = vec_pop(ENV->WS);
 		temp = vec_size(ENV->WS) ? vec_pop(ENV->WS) : 0;
-		assert(!SPECIAL(temp) && LIST(temp));
+		assert(!SPECIAL(temp) && !WORD(temp));
 		list = (Stack *)temp;
+		if (!list)
+		    vec_init(list);
 		vec_push(list, value);
 		vec_push(ENV->WS, (intptr_t)list);
 		break;
@@ -306,7 +311,7 @@ again:
 		break;
     case '/'  : assert(vec_size(ENV->WS));
 		temp = vec_pop(ENV->WS);
-		assert(!SPECIAL(temp) && LIST(temp));
+		assert(!SPECIAL(temp) && !WORD(temp));
 		list = (Stack *)temp;
 		assert(vec_size(list));
 		temp = vec_pop(list);
@@ -332,7 +337,8 @@ again:
 		temp = vec_pop(ENV->WS);
 		assert(temp & BIT_IDENT);
 		ptr = (char *)(temp & ~BIT_IDENT);
-		for (list = 0, i = strlen(ptr) - 1; i >= 0; i--)
+		vec_init(list);
+		for (i = strlen(ptr) - 1; i >= 0; i--)
 		    vec_push(list, ch2word(ENV->STR, ptr[i]));
 		vec_push(ENV->WS, (intptr_t)list);
 		break;
@@ -361,7 +367,7 @@ again:
 		break;
     case '>'  : assert(vec_size(ENV->WS));
 		temp = vec_pop(ENV->WS);
-		assert(!SPECIAL(temp) && LIST(temp));
+		assert(!SPECIAL(temp) && !WORD(temp));
 		list = (Stack *)temp;
 		ptr = ident;
 		for (j = 0, i = vec_size(list) - 1; i >= 0; i--) {
