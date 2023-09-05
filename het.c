@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.14
-    date    : 08/06/23
+    version : 1.16
+    date    : 09/05/23
 */
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +25,8 @@
 
 #define SPECIAL(i)	((i) >= '!' && (i) <= '?')
 #define WORD(i)		((i) & BIT_IDENT)
+
+char *bottom_of_stack;			/* global variable */
 
 static char ident[MAX_IDENT + 1];	/* identifier */
 
@@ -499,6 +501,7 @@ int main(int argc, char *argv[])
 {
     int (* volatile m)(int, char **) = start_main;
 
-    GC_init(&argc);
+    bottom_of_stack = (char *)&argc;
+    GC_INIT();
     return (*m)(argc, argv);
 }

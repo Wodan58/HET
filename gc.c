@@ -1,7 +1,7 @@
 /*
     module  : gc.c
-    version : 1.35
-    date    : 08/06/23
+    version : 1.37
+    date    : 08/27/23
 */
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +23,7 @@
 #include "gc.h"
 
 #ifdef _MSC_VER
-#define DOWN_64K        ~0xFFFF
+#define DOWN_64K	~0xFFFF
 #define PEPOINTER       15
 #define IMAGE_BASE      13
 #define BASE_OF_CODE    11
@@ -32,19 +32,19 @@
 #define SIZE_OF_BSS      9
 #endif
 
-#define GC_COLL          0
-#define GC_LEAF          1
-#define GC_MARK          2
+#define GC_COLL		0
+#define GC_LEAF		1
+#define GC_MARK		2
 
-#define BSS_ALIGN        4
-#define MIN_ITEMS        4
-#define MAX_ITEMS        2
-#define FULL_MASK        (uint64_t)0x0000fffffffffffe
+#define BSS_ALIGN	4
+#define MIN_ITEMS	4
+#define MAX_ITEMS	2
+#define MAX_SIZE	50000000
 
 /*
     When pointers are 16 bit aligned, the lower 4 bits are always zero.
 */
-#define HASH_FUNCTION(key)        (khint_t)((key) >> 4)
+#define HASH_FUNCTION(key)	(khint_t)((key) >> 4)
 
 typedef struct mem_info {
     unsigned flags: 2;
@@ -56,28 +56,28 @@ typedef struct mem_info {
 */
 KHASH_INIT(Backup, uint64_t, mem_info, 1, HASH_FUNCTION, kh_int64_hash_equal)
 
-static khint_t max_items;                /* max. items before gc      */
-static khash_t(Backup) *MEM;             /* backup of pointers        */
-static uint64_t bottom, lower, upper;    /* stack bottom, heap bounds */
+static khint_t max_items;	/* max. items before gc */
+static khash_t(Backup) *MEM;	/* backup of pointers */
+static uint64_t lower, upper;	/* heap bounds */
 
 /*
     Pointers to memory segments.
 */
 #ifdef SCAN_BSS_MEMORY
 static uint64_t start_of_text,
-                start_of_data,
-                start_of_bss,
-                start_of_heap;
+		start_of_data,
+		start_of_bss,
+		start_of_heap;
 #endif
 
 /*
     mem_fatal - Report a fatal error and end the program. The message is taken
-                from yacc.
+		from yacc.
 */
 static void mem_fatal(void)
 {
     fprintf(stderr, "memory exhausted\n");
-    exit(0);
+    exit(EXIT_FAILURE);
 }
 
 /*
@@ -133,8 +133,8 @@ static void mem_exit(void)
     khiter_t key;
 
     for (key = kh_begin(MEM); key != kh_end(MEM); key++)
-        if (kh_exist(MEM, key))
-            free((void *)kh_key(MEM, key));
+	if (kh_exist(MEM, key))
+	    free((void *)kh_key(MEM, key));
     kh_destroy(Backup, MEM);
 }
 #endif
@@ -142,7 +142,7 @@ static void mem_exit(void)
 /*
     Initialise gc memory.
 */
-void GC_init(void *ptr)
+void GC_INIT()
 {
 #ifdef SCAN_BSS_MEMORY
     init_heap();
@@ -150,7 +150,6 @@ void GC_init(void *ptr)
 #ifdef FREE_ON_EXIT
     atexit(mem_exit);
 #endif
-    bottom = (uint64_t)ptr;
     MEM = kh_init(Backup);
     max_items = MIN_ITEMS;
 }
@@ -165,18 +164,17 @@ static void mark_ptr(char *ptr)
     uint64_t value;
 
     value = (uint64_t)ptr;
-    value &= FULL_MASK;
     if (value < lower || value >= upper)
-        return;
+	return;
     if ((key = kh_get(Backup, MEM, value)) != kh_end(MEM)) {
-        if (kh_value(MEM, key).flags & GC_MARK)
-            return;
-        kh_value(MEM, key).flags |= GC_MARK;
-        if (kh_value(MEM, key).flags & GC_LEAF)
-            return;
-        size = kh_value(MEM, key).size / sizeof(char *);
-        for (i = 0; i < size; i++)
-            mark_ptr(((char **)value)[i]);
+	if (kh_value(MEM, key).flags & GC_MARK)
+	    return;
+	kh_value(MEM, key).flags |= GC_MARK;
+	if (kh_value(MEM, key).flags & GC_LEAF)
+	    return;
+	size = kh_value(MEM, key).size / sizeof(char *);
+	for (i = 0; i < size; i++)
+	    mark_ptr(((char **)value)[i]);
     }
 }
 
@@ -189,12 +187,12 @@ static void mark_stk(void)
   
 #ifdef STACK_GROWS_UPWARD
     if (ptr > bottom)
-        for (; ptr > bottom; ptr -= sizeof(char *))
-            mark_ptr(*(char **)ptr);
+	for (; ptr > (uint64_t)bottom_of_stack; ptr -= sizeof(char *))
+	    mark_ptr(*(char **)ptr);
     else
 #endif
-        for (; ptr < bottom; ptr += sizeof(char *))
-            mark_ptr(*(char **)ptr);
+	for (; ptr < (uint64_t)bottom_of_stack; ptr += sizeof(char *))
+	    mark_ptr(*(char **)ptr);
 }
 
 /*
@@ -207,7 +205,7 @@ static void mark_bss(void)
 
     end_of_bss = start_of_heap - sizeof(void *);
     for (ptr = start_of_bss; ptr <= end_of_bss; ptr += BSS_ALIGN)
-        mark_ptr(*(char **)ptr);
+	mark_ptr(*(char **)ptr);
 }
 #endif
 
@@ -220,14 +218,14 @@ static void scan(void)
     khiter_t key;
 
     for (key = kh_begin(MEM); key != kh_end(MEM); key++)
-        if (kh_exist(MEM, key)) {
-            if (kh_value(MEM, key).flags & GC_MARK)
-                kh_value(MEM, key).flags &= ~GC_MARK;
-            else {
-                free((void *)kh_key(MEM, key));
-                kh_del(Backup, MEM, key);
-            }
-        }
+	if (kh_exist(MEM, key)) {
+	    if (kh_value(MEM, key).flags & GC_MARK)
+		kh_value(MEM, key).flags &= ~GC_MARK;
+	    else {
+		free((void *)kh_key(MEM, key));
+		kh_del(Backup, MEM, key);
+	    }
+	}
 }
 
 /*
@@ -264,15 +262,15 @@ static void remind(char *ptr, size_t size, int flags)
 
     value = (uint64_t)ptr;
     if (lower > value || !lower)
-        lower = value;
+	lower = value;
     if (upper < value + size)
-        upper = value + size;
+	upper = value + size;
     key = kh_put(Backup, MEM, value, &rv);
     kh_value(MEM, key).flags = flags;
     kh_value(MEM, key).size = size;
     if (max_items < kh_size(MEM)) {
-        GC_gcollect();
-        max_items = kh_size(MEM) * MAX_ITEMS;
+	GC_gcollect();
+	max_items = kh_size(MEM) * MAX_ITEMS;
     }
 }
 
@@ -283,8 +281,8 @@ static void *mem_block(size_t size, int f)
 {
     void *ptr;
 
-    if ((ptr = malloc(size)) == 0)
-        mem_fatal();
+    if (size > MAX_SIZE || (ptr = malloc(size)) == 0)
+	mem_fatal();
     memset(ptr, 0, size);
     remind(ptr, size, f);
     return ptr;
@@ -319,7 +317,7 @@ static void update(void *ptr, size_t size)
     khiter_t key;
 
     if ((key = kh_get(Backup, MEM, (uint64_t)ptr)) != kh_end(MEM))
-        kh_value(MEM, key).size = size;
+	kh_value(MEM, key).size = size;
 }
 
 /*
@@ -331,8 +329,8 @@ static unsigned char forget(void *ptr)
     unsigned char flags = 0;
 
     if ((key = kh_get(Backup, MEM, (uint64_t)ptr)) != kh_end(MEM)) {
-        flags = kh_value(MEM, key).flags;
-        kh_del(Backup, MEM, key);
+	flags = kh_value(MEM, key).flags;
+	kh_del(Backup, MEM, key);
     }
     return flags;
 }
@@ -345,13 +343,13 @@ void *GC_realloc(void *old, size_t size)
     void *ptr;
 
     if (!old)
-        return GC_malloc(size);
+	return GC_malloc(size);
     if ((ptr = realloc(old, size)) == 0)
-        mem_fatal();
+	mem_fatal();
     if (ptr == old)
-        update(ptr, size);
+	update(ptr, size);
     else
-        remind(ptr, size, forget(old));
+	remind(ptr, size, forget(old));
     return ptr;
 }
 #endif
@@ -367,18 +365,18 @@ char *GC_strdup(const char *str)
 
     leng = strlen(str);
     if ((ptr = GC_malloc_atomic(leng + 1)) != 0)
-        strcpy(ptr, str);
+	strcpy(ptr, str);
     return ptr;
 }
 #endif
 
 #ifdef USE_GC_GET_HEAP_SIZE
 /*
-    Return the number of memory blocks.
+    Return the number of bytes that have been freed.
 */
-size_t GC_get_heap_size(void)
+size_t GC_get_free_bytes(void)
 {
-    return max_items;
+    return 0;
 }
 
 /*
