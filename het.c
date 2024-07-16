@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.16
-    date    : 09/05/23
+    version : 1.17
+    date    : 07/03/24
 */
 #include <stdio.h>
 #include <string.h>
@@ -495,6 +495,16 @@ int start_main(int argc, char *argv[])
 	    print(&ENV);
     }
     return 0;
+}
+
+/*
+ * fatal terminates the application with an error message.
+ */
+void fatal(char *str)
+{
+    fflush(stdout);
+    fprintf(stderr, "fatal error: %s\n", str);
+    exit(EXIT_FAILURE);
 }
 
 int main(int argc, char *argv[])

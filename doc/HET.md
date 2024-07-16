@@ -10,12 +10,7 @@ design choices in the C implementation of the language.
 Walkthrough
 ===========
 
-The C sources are divided up into 3 files: het.c, memory.c, and rmalloc.c
-Starting with rmalloc.c, this file checks that all allocated memory gets freed
-at the end of the program. It also captures dubious constructs, such as
-allocating 0 bytes. The file memory.c contains `mark` and `scan`, two functions
-that allow some of the allocated memory to be garbage collected.
-
+The C sources are divided up into 2 files: het.c and gc.c.
 The file het.c contains the main body of the code. It is logically subdivided
 into several unnamed sections. These sections could have been separate files,
 but because the total number of lines is so small, they are more easily seen
@@ -24,7 +19,7 @@ in one file.
 Technicalities
 ==============
 
-The empty list, `()`, is internally represented with an intptr_t that has all
+The empty list, `()`, is internally represented with an intptr\_t that has all
 bits set to zero, or as a pointer to a list with no entries. The two are
 treated as equal by `=`.
 
@@ -40,12 +35,12 @@ ultimate reference.
 Limitations
 ===========
 
-At the start of het.c there is a define MAX_IDENT that restricts the number
+At the start of het.c there is a define MAX\_IDENT that restricts the number
 of unique characters in a name to 100. It doesn't seem necessary to have an
 unlimited number of characters in a name and using a static array is the
-easiest implementation but comes with a maximum number that must be set to
-a certain value and 100 seems generous enough. In reality I wouldn't want
-names longer than 30 characters.
+easiest implementation but comes with a maximum number that must be set to a
+certain value and 100 seems generous enough. In reality I wouldn't want names
+longer than 30 characters.
 
 Another limitation is contained in markfactor that calls marklist that calls
 markfactor. This can't go on forever. There is a recursion limit imposed by
@@ -74,10 +69,3 @@ another. Compiling could be used to get rid of the symbol tables.
 The nice thing about how HET executes, is that it doesn't use stack space,
 unless a call to `gc` is inserted in HET source code. HET does use allocated
 memory and that makes it not eligible for embedded systems.
-
-Main future plans are to connect HET to a GUI and to a database. The database
-can be implemented in HET itself, as soon as some file functions have been
-added; the GUI needs external assistance altogether.
-
-But first, all of the Joy example files must be implemented in HET. It looks
-possible, but maybe there are some bears on the road.

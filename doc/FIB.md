@@ -19,7 +19,7 @@ be converted from presentation format to binary format. And all of that needs
 to be stored in memory that is allocated from the heap. The result of
 calculating fib(35) is given in this picture:
 
- ![](fib1.PNG)
+ ![](HET.PNG)
 
 42minjoy
 --------
@@ -32,7 +32,7 @@ when reading the text of the function; function addresses are used when
 evaluating a function. Integers are available in binary format. And the
 garbage collector is used, whenever the memory array has been fully used.
 
- ![](fib3.PNG)
+ ![](42minjoy.PNG)
 
 joy0
 ----
@@ -40,37 +40,57 @@ joy0
 The super original Joy uses a copying collector that is faster than the
 mark/scan collector used in 42minjoy.
 
- ![](fib2.PNG)
+ ![](joy0.PNG)
+
+Legacy
+------
+
+The legacy version is similar to joy0, except that it has more builtins.
+
+ ![](Legacy.PNG)
 
 JOY
 ---
 
-The original Joy is similar to joy0, but uses a flexible array as memory area.
+The original Joy is similar to Legacy, but uses a flexible array as memory area.
 
- ![](fib4.PNG)
+ ![](Joy.PNG)
 
 joy1
 ----
 
-The modified version of Joy is no longer linked to the BDW garbage collector.
-It uses a simpler mark/scan collector. That makes it slower than Joy.
+The original Joy linked to the BDW garbage collector.
 
- ![](fib5.PNG)
+ ![](joy1.PNG)
+
+Foy
+---
+
+Foy is a Forth-inspired Joy that uses vectors for stack and code.
+
+ ![](Foy.PNG)
 
 Moy
 ---
 
-Moy is similar to joy1. Maybe programmed more efficiently?
+Moy also uses vectors for stack and code. The implementation of those vectors
+differ from those of Foy.
 
- ![](fib6.PNG)
+ ![](Moy.PNG)
 
-Coy
+Soy
 ---
 
-Coy uses an array as stack. As such it benefits from a modified condition:
-`dup small` instead of `small`. The latter also works, but is slower.
+Soy uses the same code as Moy, compiled to a stand-alone binary.
 
- ![](fib7.PNG)
+ ![](Soy.PNG)
+
+Roy
+---
+
+Roy uses code that differs from Moy. It allows recursion on the hardware stack.
+
+ ![](Roy.PNG)
 
 Source code
 ===========
@@ -78,57 +98,63 @@ Source code
 HET
 ---
 
-	#define sub		sub $
-	#define add		add $
-	#define less		less $
-	#define abort		abort $
+	#define sub     sub $
+	#define add     add $
+	#define less    less $
 
 	(a % ; b % ; a * b *) swap : ;
-	#define swap		swap * !
+	#define swap    swap * !
 
 	(a % a *) dup : ;
-	#define dup		dup * !
+	#define dup     dup * !
 
 	( () t : ;
 	  (1 sub dup fib_rec * ! swap 1 sub fib_rec * ! add) f : ;
 	dup 2 less * !) fib_rec : ;
-	#define fib_rec		fib_rec * !
+	#define fib_rec fib_rec * !
 
 	35 fib_rec .
-	abort .
 
-The `abort` prevents the cleanup of memory that would require an inordinate
-amount of time. Also note that this source must be run through the C
-preprocessor before it can be executed.
+Note that this source must be run through the C preprocessor before it can be
+executed.
 
 42minjoy
 --------
 
 	fib == dup 2 < [[1 - dup fib swap 1 - fib +] []] index i.
 
-	[35 fib put 10 putch].
+	35 fib.
 
-The source code comes in two files.
+The source code comes in two files. The first file is included from
+42minjoy.lib
 
-joy0 and JOY
-------------
+joy0
+----
 
 	0 __settracegc.
 	35 [small] [] [pred dup pred] [+] binrec.
 
 The `__settracegc` is needed in order to prevent many messages about the
 garbage collector that would slow the program down.
-
-joy1 and Moy
-------------
+s
+Legacy, Joy, and joy1
+---------------------
 
 	35 [small] [] [pred dup pred] [+] binrec.
 
-joy1 and Moy do not need __settracegc.
+Legacy, Joy, and joy1 do not need `__settracegc`.
 
-Coy
----
+Foy, Moy, Soy, and Roy
+----------------------
 
 	35 [dup small] [] [pred dup pred] [+] binrec.
 
-Coy benefits from using `dup` in the condition.
+Foy and Moy benefit from using `dup` in the condition; Soy and Roy require it.
+
+Conclusion
+==========
+
+HET is slowest, by far, followed by joy1. Roy is fastest, followed by joy0.
+Even though Roy is compiled, it is not significantly faster than joy0. The
+reason is that although Roy is compiled, it still uses exeterm, that is the
+interpeter, to evaluate programs.

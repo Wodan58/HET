@@ -1,7 +1,7 @@
 #
 #   module  : unit.het
-#   version : 1.4
-#   date    : 01/20/20
+#   version : 1.5
+#   date    : 07/03/24
 #
 
 # push and execute word
@@ -42,7 +42,7 @@ aap aap = .
 () = .
 
 # compare two specials, collect garbage
-(a % ; b % ; gc $ a * b *) swap : ;
+(a % ; b % ; a * b *) swap : ;
 (;) / (;) / swap * ! ; = . ;
 
 # convert a list to a word

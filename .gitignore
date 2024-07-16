@@ -3,6 +3,7 @@ CMakeCache.txt
 CMakeFiles
 demo*.txt
 het
+het.tar
 het.exe
 Makefile
 builtin.c
