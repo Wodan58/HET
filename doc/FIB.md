@@ -136,7 +136,7 @@ joy0
 
 The `__settracegc` is needed in order to prevent many messages about the
 garbage collector that would slow the program down.
-s
+
 Legacy, Joy, and joy1
 ---------------------
 
