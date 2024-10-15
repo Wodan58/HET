@@ -1,24 +1,29 @@
 /*
     module  : het.c
-    version : 1.17
-    date    : 07/03/24
+    version : 1.19
+    date    : 09/25/24
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <math.h>
 #include <assert.h>
 #include <inttypes.h>
 #include "gc.h"
+
+#ifdef _MSC_VER
+#pragma warning(disable: 4244 4267)
+#endif
 
 #define kmalloc(Z)		GC_malloc(Z)
 #define kcalloc(N,Z)		GC_malloc((N)*(Z))
 #define krealloc(N,Z)		GC_realloc((N),(Z))
 #define kfree(Z)
 
-#include "khash.h"
 #include "kvec.h"
+#include "khash.h"
 
 #define BIT_IDENT	1
 #define MAX_IDENT	100
@@ -279,7 +284,7 @@ again:
 		if (!temp || SPECIAL(temp) || WORD(temp))
 		    local(ENV, ptr, temp);
 		else {
-		    vec_copy(list, (Stack *)temp);
+		    vec_copy_all(list, (Stack *)temp);
 		    local(ENV, ptr, (intptr_t)list);
 		}
 		break;
@@ -328,7 +333,7 @@ again:
 		if (!temp || SPECIAL(temp) || WORD(temp))
 		    enter(ENV, ptr, temp);
 		else {
-		    vec_copy(list, (Stack *)temp);
+		    vec_copy_all(list, (Stack *)temp);
 		    enter(ENV, ptr, (intptr_t)list);
 		}
 		break;
@@ -465,7 +470,7 @@ void init(eval_env *ENV)
     init_ffi(ENV);
 }
 
-int start_main(int argc, char *argv[])
+void my_main(int argc, char *argv[])
 {
     char *ptr;
     eval_env ENV;
@@ -482,7 +487,7 @@ int start_main(int argc, char *argv[])
 	}
         if (ptr && !freopen(ptr, "r", stdin)) {
 	    fprintf(stderr, "failed to open the file '%s'.\n", ptr);
-	    return 0;
+	    return;
 	}
     }
     setbuf(stdout, 0);
@@ -494,24 +499,26 @@ int start_main(int argc, char *argv[])
 	if (eval(&ENV), debugging)
 	    print(&ENV);
     }
-    return 0;
 }
 
 /*
  * fatal terminates the application with an error message.
  */
+#ifdef _MSC_VER
 void fatal(char *str)
 {
     fflush(stdout);
     fprintf(stderr, "fatal error: %s\n", str);
     exit(EXIT_FAILURE);
 }
+#endif
 
 int main(int argc, char *argv[])
 {
-    int (* volatile m)(int, char **) = start_main;
+    void (* volatile m)(int, char **) = my_main;
 
     bottom_of_stack = (char *)&argc;
     GC_INIT();
-    return (*m)(argc, argv);
+    (*m)(argc, argv);
+    return 0;
 }

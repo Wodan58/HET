@@ -1,11 +1,7 @@
-cmake_install.cmake
-CMakeCache.txt
-CMakeFiles
+files
+build
 demo*.txt
-het
 het.tar
-het.exe
-Makefile
 builtin.c
 builtin.h
 tut.het

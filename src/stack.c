@@ -1,7 +1,7 @@
 /*
     module  : stack.c
-    version : 1.3
-    date    : 06/22/20
+    version : 1.5
+    date    : 09/25/24
 */
 
 /**
@@ -12,6 +12,6 @@ void do_stack(eval_env *ENV)
 {
     Stack *list;
 
-    vec_copy(list, ENV->WS);
+    vec_copy_all(list, ENV->WS);
     vec_push(ENV->WS, (intptr_t)list);
 }
