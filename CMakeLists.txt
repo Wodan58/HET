@@ -1,14 +1,18 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.17
-#   date    : 09/25/24
+#   version : 1.18
+#   date    : 10/15/24
 #
 cmake_minimum_required(VERSION 3.5)
 project(HET VERSION 1.0)
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release")
 endif()
-option(RUN_TESTS "Run standard tests" ON)
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  option(RUN_TESTS "Run standard tests" ON)
+else()
+  option(RUN_TESTS "Run standard tests" OFF)
+endif()
 add_executable(het het.c gc.c)
 add_dependencies(het always)
 add_custom_target(always
