@@ -1,9 +1,1 @@
-files
-build
-demo*.txt
-het.tar
-builtin.c
-builtin.h
-tut.het
-fib.het
-banner.sh
+*.tar

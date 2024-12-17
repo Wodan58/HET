@@ -4,7 +4,7 @@
 Introduction
 ============
 
-HET itself is explained in the README file. This documents explains some of the
+HET itself is explained in the README file. This document explains some of the
 design choices in the C implementation of the language.
 
 Walkthrough

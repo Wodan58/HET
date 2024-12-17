@@ -1,7 +1,7 @@
 /*
     module  : less.c
-    version : 1.4
-    date    : 06/22/20
+    version : 1.5
+    date    : 12/16/24
 */
 
 /**
@@ -17,7 +17,7 @@ void do_less(eval_env *ENV)
     assert(vec_size(ENV->WS) > 1);
     second = (char *)(vec_pop(ENV->WS) & ~BIT_IDENT);
     first = (char *)(vec_pop(ENV->WS) & ~BIT_IDENT);
-    if (isdigit(*first) && isdigit(*second)) {
+    if (isdigit((int)*first) && isdigit((int)*second)) {
 	leng1 = strlen(first);
 	leng2 = strlen(second);
 	if (leng1 != leng2) {

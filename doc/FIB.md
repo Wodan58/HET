@@ -155,6 +155,5 @@ Conclusion
 ==========
 
 HET is slowest, by far, followed by joy1. Roy is fastest, followed by joy0.
-Even though Roy is compiled, it is not significantly faster than joy0. The
-reason is that although Roy is compiled, it still uses exeterm, that is the
-interpeter, to evaluate programs.
+Roy is faster than joy0, because it is compiled to C. And so is Soy, but Soy
+uses the exact same code as Moy.

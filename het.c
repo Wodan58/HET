@@ -1,7 +1,7 @@
 /*
     module  : het.c
-    version : 1.19
-    date    : 09/25/24
+    version : 1.21
+    date    : 12/16/24
 */
 #include <stdio.h>
 #include <string.h>
@@ -37,11 +37,13 @@ static char ident[MAX_IDENT + 1];	/* identifier */
 
 typedef vector(intptr_t) Stack;
 
-KHASH_MAP_INIT_STR(Symbol, intptr_t);
+KHASH_MAP_INIT_STR(Symbol, intptr_t)
 
-typedef void (*proc_t)();
+typedef struct eval_env eval_env;	/* forward declaration */
 
-KHASH_MAP_INIT_STR(Foreign, proc_t);
+typedef void (*proc_t)(eval_env *ENV);
+
+KHASH_MAP_INIT_STR(Foreign, proc_t)
 
 typedef struct name_val {
     char *name;
@@ -52,9 +54,9 @@ typedef vector(name_val) Local;
 
 typedef vector(int) Index;
 
-KHASH_SET_INIT_STR(Strings);
+KHASH_SET_INIT_STR(Strings)
 
-typedef struct eval_env {
+struct eval_env {
     intptr_t t, f, s, w, l;	/* standard identifiers */
     Stack *WS, *PS;		/* working stack, program stack */
     khash_t(Symbol) *MEM;	/* memory */
@@ -62,7 +64,7 @@ typedef struct eval_env {
     Local *LOC;			/* local definitions/variables */
     Index *IDX;			/* frame pointers */
     khash_t(Strings) *STR;	/* string table */
-} eval_env;
+};
 
 int yylex(void);
 void readfactor(eval_env *ENV, int ch);

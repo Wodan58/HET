@@ -1,0 +1,10 @@
+inter(ENV, "add", do_add);
+inter(ENV, "gc", do_gc);
+inter(ENV, "get", do_get);
+inter(ENV, "less", do_less);
+inter(ENV, "mul", do_mul);
+inter(ENV, "put", do_put);
+inter(ENV, "putch", do_putch);
+inter(ENV, "stack", do_stack);
+inter(ENV, "sub", do_sub);
+inter(ENV, "unstack", do_unstack);

@@ -1,0 +1,185 @@
+-- aap
+aap -- !
+aap -- .
+aap
+-- (aap noot mies)
+(aap noot mies) -- !
+-- (
+-- aap
+aap -- noot
+aap noot -- mies
+aap noot mies -- )
+mies
+aap noot --
+aap noot -- ;
+aap --
+aap -- ;
+-- (;)
+(;) -- /
+() ; -- !
+() -- ;
+-- .
+-- (a : a *)
+(a : a *) -- dup
+(a : a *) dup -- :
+(a : a *) -- ;
+-- aap
+aap -- dup
+aap dup -- *
+aap (a : a *) -- !
+aap -- (
+aap -- a
+aap a -- :
+aap -- a
+aap a -- *
+aap aap -- )
+aap
+aap --
+aap -- .
+aap
+-- aap
+aap -- +
+(aap) -- .
+(aap)
+-- (aap)
+(aap) -- noot
+(aap) noot -- +
+(noot aap) -- .
+(noot aap)
+-- (aap)
+(aap) -- /
+() aap -- .
+aap
+() --
+() -- .
+()
+-- (aap noot)
+(aap noot) -- /
+(noot) aap -- .
+aap
+(noot) --
+(noot) -- .
+(noot)
+-- noot
+noot -- <
+(n o o t) -- .
+(n o o t)
+-- gc
+gc -- $
+-- .
+-- aap
+aap -- aap
+aap aap -- =
+t -- .
+t
+-- ()
+() -- =
+t -- .
+t
+-- (a % ; b % ; a * b *)
+(a % ; b % ; a * b *) -- swap
+(a % ; b % ; a * b *) swap -- :
+(a % ; b % ; a * b *) -- ;
+-- (;)
+(;) -- /
+() ; -- (;)
+() ; (;) -- /
+() ; () ; -- swap
+() ; () ; swap -- *
+() ; () ; (a % ; b % ; a * b *) -- !
+() ; () ; -- (
+() ; () ; -- a
+() ; () ; a -- %
+() ; () ; -- ;
+() ; () -- b
+() ; () b -- %
+() ; () -- ;
+() ; -- a
+() ; a -- *
+() ; ; -- b
+() ; ; b -- *
+() ; ; () -- )
+() ; ; --
+() ; ; -- =
+() t -- .
+t
+() --
+() -- ;
+-- (n o o t)
+(n o o t) -- >
+noot -- .
+noot
+-- aap
+aap -- ?
+w -- .
+w
+-- (aap)
+(aap) -- ?
+l -- .
+l
+-- (;)
+(;) -- /
+() ; -- ?
+() s -- .
+s
+() --
+() -- ;
+-- aap
+aap -- =
+f -- .
+f
+-- aap
+aap -- ()
+aap () -- =
+f -- .
+f
+-- (;)
+(;) -- /
+() ; -- semi
+() ; semi -- =
+() f -- .
+f
+() --
+() -- ;
+-- semi
+semi -- (;)
+semi (;) -- /
+semi () ; -- swap
+semi () ; swap -- *
+semi () ; (a % ; b % ; a * b *) -- !
+semi () ; -- (
+semi () ; -- a
+semi () ; a -- %
+semi () ; -- ;
+semi () -- b
+semi () b -- %
+semi () -- ;
+semi -- a
+semi a -- *
+semi ; -- b
+semi ; b -- *
+semi ; () -- )
+semi ; --
+semi ; -- =
+f -- .
+f
+-- empty
+empty -- =
+f -- .
+f
+-- empty
+empty -- ()
+empty () -- =
+f -- .
+f
+-- (1 2 3)
+(1 2 3) -- (1 2 3)
+(1 2 3) (1 2 3) -- =
+f -- .
+f
+-- 10
+10 -- 9
+10 9 -- less
+10 9 less -- $
+f -- .
+f
