@@ -1,9 +1,9 @@
 HET
----
+===
 
-Build|Linux|Windows|Coverity
----|---|---|---
-status|[![GitHub CI build status](https://github.com/Wodan58/HET/actions/workflows/cmake.yml/badge.svg)](https://github.com/Wodan58/HET/actions/workflows/cmake.yml)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/HET?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/HET)|[![Coverity Scan Build Status](https://img.shields.io/coverity/scan/22422.svg)](https://scan.coverity.com/projects/wodan58-het)
+Build|Linux
+---|---
+status|[![GitHub CI build status](https://github.com/Wodan58/HET/actions/workflows/cmake.yml/badge.svg)](https://github.com/Wodan58/HET/actions/workflows/cmake.yml)
 
 HET is a very simple educational programming language dating from 1976
 and described in this [document](https://ir.cwi.nl/pub/12870/12870D.pdf),
@@ -67,5 +67,6 @@ They are mentioned [here](https://forth.hcc.nl/wie-zijn-wij/2010-2014.html).
 
 The version presented here can be built with these commands:
 
-    cmake .
+    cd build
+    cmake -G "Unix Makefiles" ..
     cmake --build .
