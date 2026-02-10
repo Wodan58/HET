@@ -22,7 +22,7 @@ calculating fib(35) is given in this picture:
 
  ![](HET.PNG)
 
-HET was compiled with 64-bit msvc.
+HET was compiled with 64-bit Msvc.
 
 42minjoy
 --------
@@ -37,30 +37,18 @@ garbage collector is used, whenever the memory array has been fully used.
 
  ![](42minjoy.PNG)
 
-42minjoy requires a 32-bit compiler, in this case mingw32 was used. It could
-be made a bit faster by making `pred` a builtin.
-
- ![](minjoy.PNG)
-
-And this is the result when `pred` is available as builtin. It doesn't change
-the ranking, given later on, but it comes closer to the Legacy version.
-Unlike the full version of Joy, 42minjoy does not compile the function address
-into the factors that are read from source code; instead it compiles the index
-into the symbol table. This requires a lookup at runtime. And yet, the
-performance does not differ all that much.
-
-\newpage
+42minjoy, the ugly duck, is now leading the pack as the fastest implementation.
+How did that happen? Well, firstly it doesn't read the library files. And
+secondly, all checks, diagnostics, and statistics have been turned off.
 
 joy0
 ----
 
 The super original Joy uses a copying collector that is faster than the
-mark/scan collector used in 42minjoy. Also, it has `pred` as builtin.
-
+mark/scan collector used in 42minjoy. But, it reads the library files and
+gives statistics. That makes it slower than 42minjoy.
+ 
  ![](joy0.PNG)
-
-Joy0 requires a 32-bit compiler, in this case mingw32 was used. It is faster
-than the Legacy version, maybe because it is smaller?
 
 Legacy
 ------
@@ -70,26 +58,22 @@ makes the binary a bit slower than joy0.
 
  ![](Legacy.PNG)
 
-The Legacy version requires a 32-bit compiler, in this case mingw32 was used.
-
-\newpage
-
 JOY
 ---
 
 The original Joy is similar to the Legacy version, but uses a flexible array as
 memory area. This comes with a price: performance is lower. On the other hand
-it is more comparable with joy1 in the type of programs that can be serviced.
+it is more comparable with joy1 in the type of programs that can be processed.
 
  ![](Joy.PNG)
 
-Joy and all other repositories that follow are compiled with a 64-bit compiler,
-gcc. The `-l` option prevents the loading of standard libraries.
+The `-l` option prevents the loading of standard libraries.
 
 joy1
 ----
 
-The original Joy linked to the BDW garbage collector.
+The original Joy with a simplified utils.c, linked with the BDW garbage
+collector.
 
  ![](joy1.PNG)
 
@@ -98,22 +82,20 @@ a garbage collector.
 
  ![](joy11.PNG)
 
-The compiled version of joy1 is a little bit faster, not worth the trouble of
-compiling. The dominant factor is the memory model. However fast the garbage
-collector, it cannot allocate the memory nodes that fib needs fast enough.
+The compiled version of joy1, linked with the BDW garbage collector, is faster.
+Even so, it is slower than Joy.
 
 Foy
 ---
 
-Foy is a Forth-inspired Joy that uses vectors for stack and code.
+Foy is a Forth-inspired Joy that implements stack and code with flexible arrays.
 
  ![](Foy.PNG)
 
 Moy
 ---
 
-Moy also uses vectors for stack and code. The implementation of its vectors
-differ from those of Foy.
+Moy also uses flexible arrays, different from the ones in Foy.
 
  ![](Moy.PNG)
 
@@ -126,8 +108,6 @@ Soy uses the same code as Moy, compiled to a stand-alone binary.
 
 It is bit slower than Moy and this is surprising. Is compilation not supposed
 to make a program faster?
-
-\newpage
 
 Roy
 ---
@@ -145,11 +125,11 @@ Summary
 | Binary   | Timing |
 +==========+=======:+
 | HET\     | 41.85\ |
-| 42minjoy\|  2.82\ |
-| joy0\    |  1.70\ |
-| Legacy\  |  2.01\ |
-| JOY\     |  2.90\ |
-| joy1\    | 10.19\ |
+| 42minjoy\|  1.22\ |
+| joy0\    |  1.30\ |
+| Legacy\  |  1.52\ |
+| JOY\     |  2.64\ |
+| joy1\    |  9.27\ |
 | Foy\     |  5.37\ |
 | Moy\     |  5.51\ |
 | Soy\     |  5.75\ |
@@ -187,13 +167,11 @@ executed.
 42minjoy
 --------
 
-    fib    	==  [2 <] [] [pred dup pred] [+] binrec ;
-    pred	==  1 -                 .
-
+    fib == [small] [] [pred dup pred] [+] binrec.
     35 fib.
 
-The source code is no longer in two files. And 42minjoy now has `binrec`;
-it doesn't have `pred` as builtin.
+The source code is no longer in two files. And 42minjoy now has `small`,
+`pred`, and `binrec` builtin. The simpler setup helps performance.
 
 joy0
 ----
@@ -221,6 +199,6 @@ Foy and Moy benefit from using `dup` in the condition; Soy and Roy require it.
 Conclusion
 ==========
 
-HET is slowest, by far, followed by joy1. Roy is fastest, followed by joy0.
-Roy is faster than joy0, because it is compiled to C. And so is Soy, but Soy
-uses the exact same code as Moy.
+HET is slowest, by far, followed by joy1. Roy is fastest, followed by 42minjoy.
+Roy is faster than 42minjoy, because it is compiled to C. And so is Soy, but
+Soy uses the exact same code as Moy.
